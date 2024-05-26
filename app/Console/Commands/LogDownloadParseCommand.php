@@ -47,10 +47,6 @@ class LogDownloadParseCommand extends Command
         ];
 
         $chunkCount = 10;
-
-        // 時間區間
-        $times = $cdnNetworkService->getNowTimeRanges();
-        $cdnNetwork = new CDNNetwork();
         foreach ($users as $user) {
             $domainLists =
                 $cdnNetworkService
