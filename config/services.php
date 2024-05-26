@@ -34,5 +34,6 @@ return [
     'tswd' => [
         'account' => env('TSWD_ACCOUNT'),
         'token' => env('TSWD_TOKEN'),
+        'chunk_count' => env('TSWD_CHUNK_COUNT', 10),
     ],
 ];

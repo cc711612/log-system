@@ -39,6 +39,7 @@ class LogDownloadParseCommand extends Command
          * @var CdnNetworkService
          */
         $cdnNetworkService = app(CdnNetworkService::class);
+        // 測試用 users
         $users = [
             [
                 'TSWD_Account' => config('services.tswd.account'),
@@ -46,7 +47,7 @@ class LogDownloadParseCommand extends Command
             ],
         ];
 
-        $chunkCount = 10;
+        $chunkCount = config('services.tswd.chunk_count');
         foreach ($users as $user) {
             $domainLists =
                 $cdnNetworkService
