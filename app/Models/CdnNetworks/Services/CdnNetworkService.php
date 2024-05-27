@@ -183,8 +183,8 @@ class CdnNetworkService
         $roundedTime->setSecond(0);
 
         return [
-            $roundedTime->format('Y-m-d H:i:s'),
-            $roundedTime->addMinutes(5)->format('Y-m-d H:i:s'),
+            $roundedTime->format('Y-m-d H:i:00'),
+            $roundedTime->addMinutes(5)->format('Y-m-d H:i:00'),
         ];
     }
 }
