@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Helpers\CDNNetwork;
 use App\Models\CdnNetworks\Services\CdnNetworkService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
