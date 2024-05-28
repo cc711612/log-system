@@ -1,7 +1,8 @@
 version: '3' # 目前使用的版本
-services: # services 關鍵字後面列出 web, redis 兩項專案中的服務
+services:
+    # services 關鍵字後面列出 web, redis 兩項專案中的服務
     php:
-        image: cc711612/php8.1-fpm-alpine:1.0
+        image: php8.1-fpm-alpine:1.1
         container_name: ${PROJECT_NAME}-php-fpm
         links:
             - "mysql"
@@ -31,16 +32,16 @@ services: # services 關鍵字後面列出 web, redis 兩項專案中的服務
         environment:
             - TZ=Asia/Taipei
     mysql:
-        image: mysql:8
-        container_name: ${PROJECT_NAME}-mysql
+        image: mysql:latest
         volumes:
-            - "${PROJECT_PATH}/deployment/local/mysql/data:/var/lib/mysql"
-            - "${PROJECT_PATH}/deployment/local/mysql/logs:/logs"
+            - "./mysql/data:/var/lib/mysql"
+            - "./mysql/logs:/logs"
         environment:
             - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
             - TZ=Asia/Taipei
         ports:
             - "${MYSQL_PORT}:3306"
         command:
-           - --character-set-server=utf8
-           - --default-authentication-plugin=mysql_native_password
+            - --character-set-server=utf8mb4
+            - --collation-server=utf8mb4_unicode_ci
+            - --default-authentication-plugin=mysql_native_password
