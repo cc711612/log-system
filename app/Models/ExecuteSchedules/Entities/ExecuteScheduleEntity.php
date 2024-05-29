@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class ExecuteScheduleEntity extends Model
 {
     use HasFactory, SoftDeletes;
-    protected $table = 'execute_schedule';
+    protected $table = 'execute_schedules';
 
     protected $fillable = [
         'user_idx',

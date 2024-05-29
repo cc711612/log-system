@@ -10,7 +10,7 @@ class DownloadEntity extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'download_list';
+    protected $table = 'downloads';
 
     protected $fillable = [
         'user_idx',

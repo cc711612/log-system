@@ -10,7 +10,7 @@ class MonitorEntity extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'monitoring';
+    protected $table = 'monitors';
 
     protected $fillable = [
         'item_name',

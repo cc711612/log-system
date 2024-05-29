@@ -10,12 +10,12 @@ class UserEntity extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'user_profiles';
+    protected $table = 'users';
 
     protected $fillable = [
         'display_name',
         'product_type',
-        'user',
+        'account',
         'password',
         'tswd_account',
         'tswd_token',
@@ -24,6 +24,7 @@ class UserEntity extends Model
         'influx_db_connection',
         'influx_db_bucket',
         'influx_db_token',
+        'influx_db_org'
     ];
 
     protected $hidden = [
