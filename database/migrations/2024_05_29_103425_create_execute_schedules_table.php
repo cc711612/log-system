@@ -16,8 +16,8 @@ return new class extends Migration
         Schema::create('execute_schedules', function (Blueprint $table) {
             $table->id('id')->comment('唯一辨識代號'); // 唯一辨識代號，主鍵，唯一且非空
             $table->unsignedBigInteger('user_id')->comment('User Index')->index(); // 外鍵 User Index，必須且索引
-            $table->timestamp('log_time_start')->comment('Log Time Start'); // 日誌時間開始，必須
-            $table->timestamp('log_time_end')->comment('Log Time End'); // 日誌時間結束，必須
+            $table->timestamp('log_time_start')->nullable()->comment('Log Time Start'); // 日誌時間開始，必須
+            $table->timestamp('log_time_end')->nullable()->comment('Log Time End'); // 日誌時間結束，必須
             $table->string('type', 10)->comment('Type'); // 類型，必須
             $table->string('status', 10)->comment('Status'); // 狀態，必須
             $table->timestamp('process_time_start')->useCurrent()->comment('Process Time Start'); // 處理時間開始，必須，默認當前時間
