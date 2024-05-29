@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\CdnNetworks\Services\CdnNetworkService;
+use App\Models\Users\Entities\UserEntity;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 
@@ -38,20 +39,20 @@ class LogDownloadParseCommand extends Command
          * @var CdnNetworkService
          */
         $cdnNetworkService = app(CdnNetworkService::class);
-        // 測試用 users
-        $users = [
-            [
-                'TSWD_Account' => config('services.tswd.account'),
-                'TSWD_Token' => config('services.tswd.token'),
-            ],
-        ];
+
+        $users =
+            app(UserEntity::class)
+                ->get()
+                ->toArray()
+            ;
 
         $chunkCount = config('services.tswd.chunk_count');
+
         foreach ($users as $user) {
             $domainLists =
                 $cdnNetworkService
-                ->setAccount(Arr::get($user, 'TSWD_Account'))
-                ->setToken(Arr::get($user, 'TSWD_Token'))
+                ->setAccount(Arr::get($user, 'tswd_account'))
+                ->setToken(Arr::get($user, 'tswd_token'))
                 ->getDomainList();
 
             // 測試 start
@@ -63,6 +64,7 @@ class LogDownloadParseCommand extends Command
                         '2024-05-24 13:00:00',
                     ]
                 );
+
             if (!empty($downloadLinks['logs'])) {
                 $cdnNetworkService
                     ->setAccount(Arr::get($user, 'TSWD_Account'))

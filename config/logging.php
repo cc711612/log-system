@@ -117,6 +117,13 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+
+        'cdn_network' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/cdn_network.log'),
+            'level' => 'info',
+            'days' => 30,
+        ],
     ],
 
 ];

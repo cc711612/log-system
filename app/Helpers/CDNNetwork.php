@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class CDNNetwork
@@ -208,16 +209,34 @@ class CDNNetwork
     public function sendPost($fullHttpUrl, $body)
     {
         $ch = curl_init();
+        $encode_body = json_encode($body);
+        $header = $this->createHeader('POST');
+        $start_at = now()->toDateTimeString();
+        $status = "True";
+
         curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $encode_body);
         curl_setopt($ch, CURLOPT_URL, $fullHttpUrl);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $this->createHeader('POST'));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
 
-        $result = curl_exec($ch);
+        try {
+            $result = curl_exec($ch);
+        } catch (\Exception $exception){
+            $status = "False";
+            $result = json_encode([]);
+        }
+
+        $end_at = now()->toDateTimeString();
+
+        Log::channel("cdn_network")->info(str_replace(
+            ["{start_at}", "{end_at}", "{status}", "{full_http_url}", "{header}", "{body}"],
+            [$start_at, $end_at, $status, $fullHttpUrl, json_encode($header), $encode_body],
+            "開始時間 {start_at}, 結束時間 {end_at}, 回傳狀態 {status} 網址 {full_http_url}, Header {header}, Body {body}"
+        ));
 
         return $result;
     }
@@ -231,7 +250,27 @@ class CDNNetwork
      */
     public function sendGet(string $url)
     {
-        return file_get_contents($url, false, stream_context_create(['http' => $this->createHeader('GET')]));
+        $ch = curl_init();
+        $header = $this->createHeader('GET');
+        $start_at = now()->toDateTimeString();
+        $status = "True";
+
+        try {
+            $result = file_get_contents($url, false, stream_context_create(['http' => $header]));
+        } catch (\Exception $exception){
+            $status = "False";
+            $result = json_encode([]);
+        }
+
+        $end_at = now()->toDateTimeString();
+
+        Log::channel("cdn_network")->info(str_replace(
+            ["{start_at}", "{end_at}", "{status}", "{full_http_url}", "{header}"],
+            [$start_at, $end_at, $status, $url, json_encode($header)],
+            "開始時間 {start_at}, 結束時間 {end_at}, 回傳狀態 {status} 網址 {full_http_url}, Header {header}"
+        ));
+
+        return $result;
     }
 
     /**
