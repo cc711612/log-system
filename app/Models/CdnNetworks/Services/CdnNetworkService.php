@@ -156,6 +156,7 @@ class CdnNetworkService
                         }
                         // 批量插入數據庫或其他操作
                         if (!empty($logs)) {
+                            Log::info("message:解析日誌成功:", $logs);
                             dump($logs);
                         }
                         // 刪除解壓後的文件
