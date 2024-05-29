@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id('idx')->comment('唯一辨識代號');
             $table->string('display_name', 50)->nullable()->comment('使用者');
             $table->string('product_type', 10)->nullable()->comment('CDN種類');
-            $table->string('user', 50)->comment('登入帳號');
+            $table->string('account', 50)->comment('登入帳號');
             $table->string('password')->comment('加密後密碼');
             $table->string('tswd_account', 50)->nullable()->comment('TSWD帳號');
             $table->string('tswd_token', 255)->nullable()->comment('TSWD金鑰');
