@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class DownloadEntity extends Model
+{
+    use HasFactory, SoftDeletes;
+
+    protected $table = 'download_list';
+
+    protected $fillable = [
+        'user_idx',
+        'url',
+        'domain_name',
+        'service_type',
+        'control_group_name',
+        'control_group_code',
+        'log_time_start',
+        'log_time_end',
+        'type',
+        'status',
+    ];
+
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'deleted_at',
+        'log_time_start',
+        'log_time_end',
+    ];
+}
