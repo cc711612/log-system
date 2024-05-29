@@ -32,7 +32,8 @@ services:
         environment:
             - TZ=Asia/Taipei
     mysql:
-        image: mysql:latest
+        image: mysql:8
+        container_name: ${PROJECT_NAME}-mysql
         volumes:
             - "./mysql/data:/var/lib/mysql"
             - "./mysql/logs:/logs"
@@ -44,4 +45,3 @@ services:
         command:
             - --character-set-server=utf8mb4
             - --collation-server=utf8mb4_unicode_ci
-            - --default-authentication-plugin=mysql_native_password

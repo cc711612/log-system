@@ -6,11 +6,14 @@
     "license": "MIT",
     "require": {
         "php": "^8.0.2",
-        "guzzlehttp/guzzle": "^7.2",
+        "guzzlehttp/guzzle": "^7.8",
+        "influxdata/influxdb-client-php": "^3.5",
         "laravel/framework": "^9.19",
         "laravel/sanctum": "^3.0",
         "laravel/telescope": "^5.0",
         "laravel/tinker": "^2.7",
+        "nyholm/psr7": "^1.8",
+        "php-http/curl-client": "^2.3",
         "predis/predis": "^2.2"
     },
     "require-dev": {
@@ -60,7 +63,8 @@
         "preferred-install": "dist",
         "sort-packages": true,
         "allow-plugins": {
-            "pestphp/pest-plugin": true
+            "pestphp/pest-plugin": true,
+            "php-http/discovery": true
         }
     },
     "minimum-stability": "stable",
