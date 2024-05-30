@@ -12,7 +12,7 @@ class ExecuteScheduleEntity extends Model
     protected $table = 'execute_schedules';
 
     protected $fillable = [
-        'user_idx',
+        'user_id',
         'log_time_start',
         'log_time_end',
         'status',

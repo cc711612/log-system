@@ -14,8 +14,8 @@ return new class extends Migration
     public function up()
     {
         Schema::create('downloads', function (Blueprint $table) {
-            $table->id('idx')->comment('唯一辨識代號'); // 唯一辨識代號，主鍵，唯一且非空
-            $table->unsignedBigInteger('user_idx')->comment('User Index')->index(); // 外鍵 User Index，必須且索引
+            $table->id('id')->comment('唯一辨識代號'); // 唯一辨識代號，主鍵，唯一且非空
+            $table->unsignedBigInteger('user_id')->comment('User Index')->index(); // 外鍵 User Index，必須且索引
             $table->text('url')->comment('Download URL'); // 下載 URL，必須
             $table->string('domain_name')->nullable()->comment('Domain'); // 域名
             $table->string('service_type')->nullable()->comment('Service Type'); // 服務類型
