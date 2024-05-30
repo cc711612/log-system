@@ -1,3 +1,4 @@
+version: '3' # 目前使用的版本
 services:
     # services 關鍵字後面列出 web, redis 兩項專案中的服務
     php:
