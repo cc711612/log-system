@@ -47,12 +47,14 @@ class InfluxDBTestCommand extends Command
             $this->error('InfluxDB is not running.');
             exit;
         }
-        
+
         // 創建數據
-        $measurement = '.nova88.in';
-        $fields = Arr::only($data[0], ['host', 'url']);
+        $measurement = 'WebLogs';
+        $fields = Arr::only($data[0], ['size']);
         foreach ($data as $log) {
             $timestamp = time() * 1000000000; // 轉換為納秒
+            // IP、Method、URL、StatusCode、UserAgent
+            $log = Arr::only($log, ['host', 'method', 'url', 'code', 'ua']);
             $influxDB->create($measurement, $fields, $log, $timestamp);
         }
 

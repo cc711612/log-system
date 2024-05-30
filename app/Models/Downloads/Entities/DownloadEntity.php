@@ -13,7 +13,7 @@ class DownloadEntity extends Model
     protected $table = 'downloads';
 
     protected $fillable = [
-        'user_idx',
+        'user_id',
         'url',
         'domain_name',
         'service_type',

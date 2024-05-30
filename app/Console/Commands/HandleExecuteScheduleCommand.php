@@ -62,7 +62,7 @@ class HandleExecuteScheduleCommand extends Command
         # 取得User
         $this->UserEntities =
             app(UserEntity::class)
-                ->whereIn("idx", $ExecuteScheduleEntities->pluck("user_idx")->toArray())
+                ->whereIn("idx", $ExecuteScheduleEntities->pluck("user_id")->toArray())
                 ->get()
                 ->keyBy("idx")
         ;
@@ -74,10 +74,10 @@ class HandleExecuteScheduleCommand extends Command
             $ExecuteScheduleEntity->update(["process_time_start" => now()->toDateTimeString(), "status" => "in progress"]);
 //            $ExecuteScheduleEntity->update(["status" => "initial"]);
 
-            $this->initCdnNetworkService($ExecuteScheduleEntity->user_idx);
+            $this->initCdnNetworkService($ExecuteScheduleEntity->user_id);
 
             # 取得 Domain List
-            foreach ($this->getDomainList($ExecuteScheduleEntity->user_idx) as $data){
+            foreach ($this->getDomainList($ExecuteScheduleEntity->user_id) as $data){
                 $this->DomainToServiceType[$data['domain-name']] = $data['service-type'];
             }
 //
@@ -105,7 +105,7 @@ class HandleExecuteScheduleCommand extends Command
                     foreach ($DownloadLinkLists['logs'] as $DomainLogData){
                         foreach ($DomainLogData['files'] as $DownloadLinks){
                             $InsertData[] = [
-                                "user_idx" => $ExecuteScheduleEntity->user_idx,
+                                "user_id" => $ExecuteScheduleEntity->user_id,
                                 "url" => Arr::get($DownloadLinks, 'logUrl'),
                                 "domain_name" => $DomainLogData["domainName"],
                                 "service_type" =>Arr::get($this->DomainToServiceType,$DomainLogData["domainName"],null),
@@ -135,15 +135,15 @@ class HandleExecuteScheduleCommand extends Command
     }
 
     /**
-     * @param $user_idx
+     * @param $user_id
      *
      * @return $this
      * @Author  : steatng
      * @DateTime: 2024/5/30 下午5:38
      */
-    private function initCdnNetworkService($user_idx)
+    private function initCdnNetworkService($user_id)
     {
-        $UserEntity = $this->UserEntities->get($user_idx);
+        $UserEntity = $this->UserEntities->get($user_id);
 
         $this->CdnNetworkService =
             app(CdnNetworkService::class)
@@ -164,16 +164,16 @@ class HandleExecuteScheduleCommand extends Command
     }
 
     /**
-     * @param $user_idx
+     * @param $user_id
      *
      * @return array|mixed
      * @Author  : steatng
      * @DateTime: 2024/5/30 下午5:38
      */
-    private function getDomainList($user_idx)
+    private function getDomainList($user_id)
     {
-        if (isset($this->UserDomainList[$user_idx])){
-            return $this->UserDomainList[$user_idx];
+        if (isset($this->UserDomainList[$user_id])){
+            return $this->UserDomainList[$user_id];
         }
 
         $this->startInfo(debug_backtrace()[0]['function']);
@@ -191,7 +191,7 @@ class HandleExecuteScheduleCommand extends Command
         }
 
 
-        $this->UserDomainList[$user_idx] = $DomainLists;
+        $this->UserDomainList[$user_id] = $DomainLists;
 
         return $DomainLists;
     }

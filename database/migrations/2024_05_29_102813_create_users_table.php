@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id('idx')->comment('唯一辨識代號');
+            $table->id('id')->comment('唯一辨識代號');
             $table->string('display_name', 50)->nullable()->comment('使用者');
             $table->string('product_type', 10)->nullable()->comment('CDN種類');
             $table->string('account', 50)->comment('登入帳號');
