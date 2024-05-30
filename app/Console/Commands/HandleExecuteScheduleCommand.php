@@ -62,9 +62,9 @@ class HandleExecuteScheduleCommand extends Command
         # 取得User
         $this->UserEntities =
             app(UserEntity::class)
-                ->whereIn("idx", $ExecuteScheduleEntities->pluck("user_id")->toArray())
+                ->whereIn("id", $ExecuteScheduleEntities->pluck("user_id")->toArray())
                 ->get()
-                ->keyBy("idx")
+                ->keyBy("id")
         ;
 
         $ExecuteScheduleEntities->each(function ($ExecuteScheduleEntity) {
@@ -127,7 +127,7 @@ class HandleExecuteScheduleCommand extends Command
             }
 
             #釋放不需要的資料
-            unset($this->UserDomainList[$ExecuteScheduleEntity->user_idx]);
+            unset($this->UserDomainList[$ExecuteScheduleEntity->user_id]);
             $this->endInfo(sprintf('ExecuteScheduleEntity id = %s',$ExecuteScheduleEntity->id));
         });
 
