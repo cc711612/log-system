@@ -121,11 +121,13 @@ class HandleExecuteScheduleCommand extends Command
                     $ExecuteScheduleEntity->update(["status" => "failure"]);
                     $this->errorInfo("getDownloadLinkByDomains 異常");
                 }
+                sleep(1);
             }
 
             #釋放不需要的資料
             unset($this->UserDomainList[$ExecuteScheduleEntity->user_id]);
             $this->endInfo(sprintf('ExecuteScheduleEntity id = %s', $ExecuteScheduleEntity->id));
+            sleep(5);
         });
 
         $this->endInfo(self::class);
@@ -181,7 +183,7 @@ class HandleExecuteScheduleCommand extends Command
             ->getDomainList();
 
         if (empty($DomainLists) == true) {
-            $this->errorInfo(debug_backtrace()[0]['function'] . "為空值");
+            $this->errorInfo(debug_backtrace()[0]['function'] . " 為空值");
             exit;
         } else {
             $this->endInfo(debug_backtrace()[0]['function']);
