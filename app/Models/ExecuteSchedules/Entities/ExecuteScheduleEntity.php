@@ -15,7 +15,6 @@ class ExecuteScheduleEntity extends Model
         'user_idx',
         'log_time_start',
         'log_time_end',
-        'type',
         'status',
         'process_time_start',
         'process_time_end',
