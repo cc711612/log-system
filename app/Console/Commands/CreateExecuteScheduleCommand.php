@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\ExecuteSchedules\Entities\ExecuteScheduleEntity;
+use App\Models\Settings\Entities\SettingEntity;
 use App\Models\Users\Entities\UserEntity;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
@@ -24,6 +25,7 @@ class CreateExecuteScheduleCommand extends Command
      */
     protected $description = '建立執行列表';
 
+    protected $Setting;
     /**
      * Execute the console command.
      *
@@ -36,8 +38,12 @@ class CreateExecuteScheduleCommand extends Command
             app(UserEntity::class)
                 ->get();
 
+        # 取得設定
+        $this->Setting = app(SettingEntity::class)
+            ->find(1);
+
         # 取得執行區間
-        $minute_range = 5;
+        $minute_range = Arr::get($this->Setting,'delay_minutes',5);
         $TimeRange = $this->handleStartEnd($minute_range);
 
         $UserEntities->each(function (UserEntity $UserEntity) use ($TimeRange){
