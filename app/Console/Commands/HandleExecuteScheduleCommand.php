@@ -55,9 +55,9 @@ class HandleExecuteScheduleCommand extends Command
         # 取得User
         $this->UserEntities =
             app(UserEntity::class)
-                ->whereIn("idx", $ExecuteScheduleEntities->pluck("user_id")->toArray())
+                ->whereIn("id", $ExecuteScheduleEntities->pluck("user_id")->toArray())
                 ->get()
-                ->keyBy("idx")
+                ->keyBy("id")
         ;
 
         $ExecuteScheduleEntities->each(function ($ExecuteScheduleEntity) {

@@ -43,7 +43,7 @@ class CreateExecuteScheduleCommand extends Command
         $UserEntities->each(function (UserEntity $UserEntity) use ($TimeRange){
             app(ExecuteScheduleEntity::class)
                 ->create([
-                    "user_idx" => $UserEntity->idx,
+                    "user_id" => $UserEntity->id,
                     "log_time_start" => Arr::get($TimeRange, 'start_at'),
                     "log_time_end" => Arr::get($TimeRange, 'end_at'),
                     "status" => "initial",
