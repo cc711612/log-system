@@ -226,6 +226,10 @@ class CDNNetwork
         try {
             $result = curl_exec($ch);
         } catch (\Exception $exception){
+            $result = "false";
+        }
+
+        if($result === false){
             $status = "False";
             $result = json_encode([]);
         }
