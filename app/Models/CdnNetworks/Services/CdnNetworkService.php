@@ -104,6 +104,40 @@ class CdnNetworkService
     }
 
     /**
+     * 取得控制組的域名列表
+     *
+     * @param array $controlGroupCode
+     * @return array
+     */
+    public function getDomainListOfControlGroup(array $controlGroupCode = [])
+    {
+        /**
+         * @var CDNNetwork
+         */
+        $cdnNetwork = app(CDNNetwork::class);
+        $controlGroups = json_decode(
+            $cdnNetwork
+                ->setUsername($this->account)
+                ->setApiKey($this->token)
+                ->setDateTime()
+                ->getCGDomainList($controlGroupCode),
+            1
+        );
+        $controlGroups = $controlGroups['msg'] == 'success' ? $controlGroups['data']['controlGroupDetail'] : [];
+        $result = [];
+        foreach ($controlGroups as $controlGroup) {
+            foreach ($controlGroup['domainList'] as $domain) {
+                $result[$domain] = [
+                    'controlGroupCode' => $controlGroup['controlGroupCode'],
+                    'controlGroupName' => $controlGroup['controlGroupName'],
+                    'domain' => $domain,
+                ];
+            }
+        }
+        return $result;
+    }
+
+    /**
      * 下載日誌文件並解析
      *
      * @param  array  $downloadLinks

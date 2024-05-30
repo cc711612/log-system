@@ -51,9 +51,8 @@ class HandleExecuteScheduleCommand extends Command
         # 取得列表
         $ExecuteScheduleEntities =
             app(ExecuteScheduleEntity::class)
-                ->where("status", "initial")
-                ->get()
-            ;
+            ->where("status", "initial")
+            ->get();
 
         # 取得設定
         $this->Setting = app(SettingEntity::class)
@@ -62,73 +61,71 @@ class HandleExecuteScheduleCommand extends Command
         # 取得User
         $this->UserEntities =
             app(UserEntity::class)
-                ->whereIn("id", $ExecuteScheduleEntities->pluck("user_id")->toArray())
-                ->get()
-                ->keyBy("id")
-        ;
+            ->whereIn("id", $ExecuteScheduleEntities->pluck("user_id")->toArray())
+            ->get()
+            ->keyBy("id");
 
         $ExecuteScheduleEntities->each(function ($ExecuteScheduleEntity) {
-            $this->startInfo(sprintf('ExecuteScheduleEntity id = %s',$ExecuteScheduleEntity->id));
+            $this->startInfo(sprintf('ExecuteScheduleEntity id = %s', $ExecuteScheduleEntity->id));
             $this->DomainToServiceType = [];
             # 修改執行時間
-            $ExecuteScheduleEntity->update(["process_time_start" => now()->toDateTimeString(), "status" => "in progress"]);
-//            $ExecuteScheduleEntity->update(["status" => "initial"]);
+            // $ExecuteScheduleEntity->update(["process_time_start" => now()->toDateTimeString(), "status" => "in progress"]);
+            //            $ExecuteScheduleEntity->update(["status" => "initial"]);
 
             $this->initCdnNetworkService($ExecuteScheduleEntity->user_id);
 
+            $controlGroupByDomain = $this->getCdnNetworkService()->getDomainListOfControlGroup();
             # 取得 Domain List
-            foreach ($this->getDomainList($ExecuteScheduleEntity->user_id) as $data){
+            foreach ($this->getDomainList($ExecuteScheduleEntity->user_id) as $data) {
                 $this->DomainToServiceType[$data['domain-name']] = $data['service-type'];
             }
-//
-//            $this->DomainToServiceType = ['sddolo.win1167.com' => 1115];
-//            # 500 個一組
-            $UserDomainLists = array_chunk(array_keys($this->DomainToServiceType), Arr::get($this->Setting,'domain_list_chuck',500));
+            # 500 個一組
+            $UserDomainLists = array_chunk(array_keys($this->DomainToServiceType), Arr::get($this->Setting, 'domain_list_chuck', 500));
 
-            foreach ($UserDomainLists as $DomainLists){
+            foreach ($UserDomainLists as $DomainLists) {
                 $this->startInfo("getDownloadLinkByDomains");
                 # 取得下載連結
                 $DownloadLinkLists =
                     $this->getCdnNetworkService()
-                        ->getDownloadLinkByDomains(
-                            $DomainLists,
-                            [
-                                Arr::get($ExecuteScheduleEntity, "log_time_start"),
-                                Arr::get($ExecuteScheduleEntity, "log_time_end")
-                            ]
-                        );
+                    ->getDownloadLinkByDomains(
+                        $DomainLists,
+                        [
+                            Arr::get($ExecuteScheduleEntity, "log_time_start"),
+                            Arr::get($ExecuteScheduleEntity, "log_time_end")
+                        ]
+                    );
                 $this->endInfo("getDownloadLinkByDomains");
 
-                if ($DownloadLinkLists != false && empty($DownloadLinkLists['logs']) == false){
+                if ($DownloadLinkLists != false && empty($DownloadLinkLists['logs']) == false) {
                     # 儲存下載連結
                     $InsertData = [];
-                    foreach ($DownloadLinkLists['logs'] as $DomainLogData){
-                        foreach ($DomainLogData['files'] as $DownloadLinks){
+                    foreach ($DownloadLinkLists['logs'] as $DomainLogData) {
+                        foreach ($DomainLogData['files'] as $DownloadLinks) {
                             $InsertData[] = [
                                 "user_id" => $ExecuteScheduleEntity->user_id,
                                 "url" => Arr::get($DownloadLinks, 'logUrl'),
                                 "domain_name" => $DomainLogData["domainName"],
-                                "service_type" =>Arr::get($this->DomainToServiceType,$DomainLogData["domainName"],null),
+                                "service_type" => Arr::get($this->DomainToServiceType, $DomainLogData["domainName"], null),
+                                'control_group_name' => !empty($controlGroupByDomain[$DomainLogData["domainName"]]) ? $controlGroupByDomain[$DomainLogData["domainName"]]['controlGroupName'] : null,
+                                'control_group_code' => !empty($controlGroupByDomain[$DomainLogData["domainName"]]) ? $controlGroupByDomain[$DomainLogData["domainName"]]['controlGroupCode'] : null,
                                 "log_time_start" => $this->handleDateTimeFormat(Arr::get($DownloadLinks, 'dateFrom')),
                                 "log_time_end" => $this->handleDateTimeFormat(Arr::get($DownloadLinks, 'dateTo')),
                                 "type" => "initial",
                                 "status" => "initial"
                             ];
                         }
-
                         app(DownloadEntity::class)
                             ->insert($InsertData);
-
-                        $InsertData = [];
                     }
                 } else {
+                    $ExecuteScheduleEntity->update(["status" => "failure"]);
                     $this->errorInfo("getDownloadLinkByDomains 異常");
                 }
             }
 
             #釋放不需要的資料
             unset($this->UserDomainList[$ExecuteScheduleEntity->user_id]);
-            $this->endInfo(sprintf('ExecuteScheduleEntity id = %s',$ExecuteScheduleEntity->id));
+            $this->endInfo(sprintf('ExecuteScheduleEntity id = %s', $ExecuteScheduleEntity->id));
         });
 
         $this->endInfo(self::class);
@@ -147,8 +144,8 @@ class HandleExecuteScheduleCommand extends Command
 
         $this->CdnNetworkService =
             app(CdnNetworkService::class)
-                ->setAccount(Arr::get($UserEntity, 'tswd_account'))
-                ->setToken(Arr::get($UserEntity, 'tswd_token'));
+            ->setAccount(Arr::get($UserEntity, 'tswd_account'))
+            ->setToken(Arr::get($UserEntity, 'tswd_token'));
 
         return $this;
     }
@@ -158,7 +155,7 @@ class HandleExecuteScheduleCommand extends Command
      * @Author  : steatng
      * @DateTime: 2024/5/30 下午5:38
      */
-    private function getCdnNetworkService() : CdnNetworkService
+    private function getCdnNetworkService(): CdnNetworkService
     {
         return $this->CdnNetworkService;
     }
@@ -172,7 +169,7 @@ class HandleExecuteScheduleCommand extends Command
      */
     private function getDomainList($user_id)
     {
-        if (isset($this->UserDomainList[$user_id])){
+        if (isset($this->UserDomainList[$user_id])) {
             return $this->UserDomainList[$user_id];
         }
 
@@ -180,10 +177,10 @@ class HandleExecuteScheduleCommand extends Command
 
         $DomainLists =
             $this
-                ->getCdnNetworkService()
-                ->getDomainList();
+            ->getCdnNetworkService()
+            ->getDomainList();
 
-        if (empty($DomainLists) == true){
+        if (empty($DomainLists) == true) {
             $this->errorInfo(debug_backtrace()[0]['function'] . "為空值");
             exit;
         } else {
