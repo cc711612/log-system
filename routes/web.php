@@ -23,5 +23,5 @@ Route::get('/', function () {
     } catch (\Exception $e) {
         echo 'Could not connect to the database. Please check your configuration.';
     }
-    die();
+    exit();
 });

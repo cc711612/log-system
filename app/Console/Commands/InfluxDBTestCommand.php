@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Helpers\InfluxDB;
+use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 
 class InfluxDBTestCommand extends Command

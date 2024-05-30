@@ -4,10 +4,9 @@ namespace App\Helpers;
 
 use InfluxDB2\Client;
 use InfluxDB2\Model\WritePrecision;
-use InfluxDB2\WriteApi;
 use InfluxDB2\Point;
-use InfluxDB2\QueryApi; // Add this line to import the QueryApi class
-
+use InfluxDB2\QueryApi;
+use InfluxDB2\WriteApi; // Add this line to import the QueryApi class
 
 class InfluxDB
 {
@@ -19,23 +18,22 @@ class InfluxDB
          * @var Client
          */
         $this->client = new Client([
-            "url" => $url,
-            "token" => $token,
-            "org" => $org,
-            "bucket" => $bucket
+            'url' => $url,
+            'token' => $token,
+            'org' => $org,
+            'bucket' => $bucket,
         ]);
     }
 
     /**
      * Create a new data point in the InfluxDB database.
      *
-     * @param string $measurement The name of the measurement.
-     * @param array $fields The fields of the data point.
-     * @param array $tags The tags associated with the data point. (optional)
-     * @param int|null $timestamp The timestamp of the data point. (optional)
-     * @return void
+     * @param  string  $measurement  The name of the measurement.
+     * @param  array  $fields  The fields of the data point.
+     * @param  array  $tags  The tags associated with the data point. (optional)
+     * @param  int|null  $timestamp  The timestamp of the data point. (optional)
      */
-    public function create(string $measurement, array $fields, array $tags = [], int $timestamp = null): void
+    public function create(string $measurement, array $fields, array $tags = [], ?int $timestamp = null): void
     {
         /**
          * @var WriteApi
@@ -48,11 +46,11 @@ class InfluxDB
         $writeApi->write([$point], WritePrecision::NS); // 將 $precision 參數設置為 WritePrecision::NS
         $writeApi->close();
     }
-    
+
     /**
      * Reads data from InfluxDB using the given query.
      *
-     * @param string $query The query to execute.
+     * @param  string  $query  The query to execute.
      * @return array The result of the query.
      */
     public function read(string $query): array
@@ -68,11 +66,10 @@ class InfluxDB
     /**
      * Update a measurement in the InfluxDB database.
      *
-     * @param string $measurement The name of the measurement.
-     * @param string $field The field to update.
-     * @param mixed $value The new value for the field.
-     * @param string $where The condition to specify which data to update.
-     * @return void
+     * @param  string  $measurement  The name of the measurement.
+     * @param  string  $field  The field to update.
+     * @param  mixed  $value  The new value for the field.
+     * @param  string  $where  The condition to specify which data to update.
      */
     public function update(string $measurement, string $field, $value, string $where): void
     {
@@ -95,6 +92,7 @@ class InfluxDB
     public function isServiceRunning(): bool
     {
         $response = $this->client->ping();
+
         return isset($response['X-Influxdb-Version']) && isset($response['X-Influxdb-Build']);
     }
 }

@@ -43,17 +43,16 @@ class LogDownloadParseCommand extends Command
         $users =
             app(UserEntity::class)
                 ->get()
-                ->toArray()
-            ;
+                ->toArray();
 
         $chunkCount = config('services.tswd.chunk_count');
 
         foreach ($users as $user) {
             $domainLists =
                 $cdnNetworkService
-                ->setAccount(Arr::get($user, 'tswd_account'))
-                ->setToken(Arr::get($user, 'tswd_token'))
-                ->getDomainList();
+                    ->setAccount(Arr::get($user, 'tswd_account'))
+                    ->setToken(Arr::get($user, 'tswd_token'))
+                    ->getDomainList();
 
             // 測試 start
             $downloadLinks =

@@ -75,8 +75,6 @@ class CdnNetworkService
     /**
      * 取得日誌文件路徑
      *
-     * @param array $domains
-     * @param array $timeRanges
      * @return array
      */
     public function getDownloadLinkByDomains(array $domains, array $timeRanges = [])
@@ -106,7 +104,6 @@ class CdnNetworkService
     /**
      * 取得控制組的域名列表
      *
-     * @param array $controlGroupCode
      * @return array
      */
     public function getDomainListOfControlGroup(array $controlGroupCode = [])
@@ -134,6 +131,7 @@ class CdnNetworkService
                 ];
             }
         }
+
         return $result;
     }
 
@@ -149,6 +147,7 @@ class CdnNetworkService
          * @var LogParser
          */
         $logParser = app(LogParser::class);
+
         try {
             foreach ($downloadLinks as $downloadLink) {
                 $files = Arr::get($downloadLink, 'files', []);
@@ -190,7 +189,7 @@ class CdnNetworkService
                         }
                         // 批量插入數據庫或其他操作
                         if (!empty($logs)) {
-                            Log::info("message:解析日誌成功:", $logs);
+                            Log::info('message:解析日誌成功:', $logs);
                             dump($logs);
                         }
                         // 刪除解壓後的文件

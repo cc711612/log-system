@@ -25,7 +25,8 @@ class CreateExecuteScheduleCommand extends Command
      */
     protected $description = '建立執行列表';
 
-    protected $Setting;
+    protected $setting;
+
     /**
      * Execute the console command.
      *
@@ -33,28 +34,28 @@ class CreateExecuteScheduleCommand extends Command
      */
     public function handle()
     {
-        # 取得 user
-        $UserEntities =
+        // 取得 user
+        $userEntities =
             app(UserEntity::class)
                 ->get();
 
-        # 取得設定
-        $this->Setting = app(SettingEntity::class)
+        // 取得設定
+        $this->setting = app(SettingEntity::class)
             ->find(1);
 
-        # 取得執行區間
-        $minute_range = Arr::get($this->Setting,'delay_minutes',5);
-        $TimeRange = $this->handleStartEnd($minute_range);
+        // 取得執行區間
+        $minute_range = Arr::get($this->setting, 'delay_minutes', 5);
+        $timeRange = $this->handleStartEnd($minute_range);
 
-        $UserEntities->each(function (UserEntity $UserEntity) use ($TimeRange){
+        $userEntities->each(function (UserEntity $userEntity) use ($timeRange) {
             app(ExecuteScheduleEntity::class)
                 ->create([
-                    "user_id" => $UserEntity->id,
-                    "log_time_start" => Arr::get($TimeRange, 'start_at'),
-                    "log_time_end" => Arr::get($TimeRange, 'end_at'),
-                    "status" => "initial",
-                    "process_time_start" => null,
-                    "process_time_end" => null
+                    'user_id' => $userEntity->id,
+                    'log_time_start' => Arr::get($timeRange, 'start_at'),
+                    'log_time_end' => Arr::get($timeRange, 'end_at'),
+                    'status' => 'initial',
+                    'process_time_start' => null,
+                    'process_time_end' => null,
                 ]);
         });
     }
@@ -69,8 +70,8 @@ class CreateExecuteScheduleCommand extends Command
         $roundedTime->setSecond(0);
 
         return [
-            "start_at" => $roundedTime->format('Y-m-d H:i:00'),
-            "end_at" => $roundedTime->addMinutes($range)->format('Y-m-d H:i:00'),
+            'start_at' => $roundedTime->format('Y-m-d H:i:00'),
+            'end_at' => $roundedTime->addMinutes($range)->format('Y-m-d H:i:00'),
         ];
     }
 }

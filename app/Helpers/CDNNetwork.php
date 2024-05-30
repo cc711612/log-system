@@ -88,7 +88,7 @@ class CDNNetwork
      */
     public function setDateTime()
     {
-        $this->dateTime = gmdate('D, d M Y H:i:s').' GMT';
+        $this->dateTime = gmdate('D, d M Y H:i:s') . ' GMT';
 
         return $this;
     }
@@ -134,9 +134,9 @@ class CDNNetwork
     {
         return [
             'method' => $method,
-            'header' => "Accept: application/json\r\n".
-                'Date: '.$this->getDateTime()."\r\n".
-                'Authorization: Basic '.$this->getAuth(),
+            'header' => "Accept: application/json\r\n" .
+                'Date: ' . $this->getDateTime() . "\r\n" .
+                'Authorization: Basic ' . $this->getAuth(),
         ];
     }
 
@@ -163,7 +163,7 @@ class CDNNetwork
     {
         $href = sprintf('%s%s', $this->getCdnNetworkApiDomain(), $path);
 
-        if (! empty($params)) {
+        if (!empty($params)) {
             $queryString = '';
 
             foreach ($params as $key => $value) {
@@ -212,7 +212,7 @@ class CDNNetwork
         $encode_body = json_encode($body);
         $header = $this->createHeader('POST');
         $start_at = now()->toDateTimeString();
-        $status = "True";
+        $status = 'True';
 
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $encode_body);
@@ -225,21 +225,21 @@ class CDNNetwork
 
         try {
             $result = curl_exec($ch);
-        } catch (\Exception $exception){
-            $result = "false";
+        } catch (\Exception $exception) {
+            $result = 'false';
         }
 
-        if($result === false){
-            $status = "False";
+        if ($result === false) {
+            $status = 'False';
             $result = json_encode([]);
         }
 
         $end_at = now()->toDateTimeString();
 
-        Log::channel("cdn_network")->info(str_replace(
-            ["{start_at}", "{end_at}", "{status}", "{full_http_url}", "{header}", "{body}"],
+        Log::channel('cdn_network')->info(str_replace(
+            ['{start_at}', '{end_at}', '{status}', '{full_http_url}', '{header}', '{body}'],
             [$start_at, $end_at, $status, $fullHttpUrl, json_encode($header), $encode_body],
-            "開始時間 {start_at}, 結束時間 {end_at}, 回傳狀態 {status} 網址 {full_http_url}, Header {header}, Body {body}"
+            '開始時間 {start_at}, 結束時間 {end_at}, 回傳狀態 {status} 網址 {full_http_url}, Header {header}, Body {body}'
         ));
 
         return $result;
@@ -257,21 +257,21 @@ class CDNNetwork
         $ch = curl_init();
         $header = $this->createHeader('GET');
         $start_at = now()->toDateTimeString();
-        $status = "True";
+        $status = 'True';
 
         try {
             $result = file_get_contents($url, false, stream_context_create(['http' => $header]));
-        } catch (\Exception $exception){
-            $status = "False";
+        } catch (\Exception $exception) {
+            $status = 'False';
             $result = json_encode([]);
         }
 
         $end_at = now()->toDateTimeString();
 
-        Log::channel("cdn_network")->info(str_replace(
-            ["{start_at}", "{end_at}", "{status}", "{full_http_url}", "{header}"],
+        Log::channel('cdn_network')->info(str_replace(
+            ['{start_at}', '{end_at}', '{status}', '{full_http_url}', '{header}'],
             [$start_at, $end_at, $status, $url, json_encode($header)],
-            "開始時間 {start_at}, 結束時間 {end_at}, 回傳狀態 {status} 網址 {full_http_url}, Header {header}"
+            '開始時間 {start_at}, 結束時間 {end_at}, 回傳狀態 {status} 網址 {full_http_url}, Header {header}'
         ));
 
         return $result;

@@ -24,7 +24,7 @@ class UserEntity extends Model
         'influx_db_connection',
         'influx_db_bucket',
         'influx_db_token',
-        'influx_db_org'
+        'influx_db_org',
     ];
 
     protected $hidden = [

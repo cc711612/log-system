@@ -18,6 +18,6 @@ class SettingEntity extends Model
         'schedule_check_interval_minutes',
         'task_completion_alert_threshold_minutes',
         'download_task_alert_threshold_minutes',
-        'domain_list_chuck'
+        'domain_list_chuck',
     ];
 }

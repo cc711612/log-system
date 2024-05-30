@@ -1,0 +1,48 @@
+{
+    "preset": "psr12",
+    "rules": {
+        "new_with_braces": false,
+        "array_indentation": true,
+        "array_syntax": {
+            "syntax": "short"
+        },
+        "combine_consecutive_unsets": true,
+        "multiline_whitespace_before_semicolons": true,
+        "single_quote": true,
+        "blank_line_before_statement": true,
+        "braces": {
+            "allow_single_line_closure": true
+        },
+        "concat_space": {
+            "spacing": "one"
+        },
+        "declare_equal_normalize": true,
+        "function_typehint_space": true,
+        "include": true,
+        "lowercase_cast": true,
+        "no_multiline_whitespace_around_double_arrow": true,
+        "no_spaces_around_offset": true,
+        "no_unused_imports": true,
+        "no_whitespace_before_comma_in_array": true,
+        "no_whitespace_in_blank_line": true,
+        "object_operator_without_whitespace": true,
+        "ternary_operator_spaces": true,
+        "trailing_comma_in_multiline": true,
+        "trim_array_spaces": false,
+        "unary_operator_spaces": true,
+        "binary_operator_spaces": true,
+        "whitespace_after_comma_in_array": true,
+        "single_trait_insert_per_statement": false,
+        "psr_autoloading": true,
+        "method_argument_space": {
+            "on_multiline": "ensure_fully_multiline"
+        },
+        "ordered_imports": true,
+        "class_attributes_separation": {
+            "elements": {
+                "method": "one",
+                "property": "one"
+            }
+        }
+    }
+}

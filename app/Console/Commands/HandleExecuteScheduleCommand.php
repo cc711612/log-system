@@ -14,119 +14,128 @@ use Illuminate\Support\Carbon;
 /**
  * Class HandleExecuteScheduleCommand
  *
- * @package App\Console\Commands
  * @Author  : steatng
+ *
  * @DateTime: 2024/5/30 下午5:38
  */
 class HandleExecuteScheduleCommand extends Command
 {
     /**
      * @var string
+     *
      * @Author  : steatng
+     *
      * @DateTime: 2024/5/30 下午5:38
      */
     protected $signature = 'command:handle_execute_schedule';
 
     /**
      * @var string
+     *
      * @Author  : steatng
+     *
      * @DateTime: 2024/5/30 下午5:38
      */
     protected $description = '處理 execute_schedule ';
 
-    private $CdnNetworkService;
-    private $UserEntities;
-    private $UserDomainList = [];
-    protected $Setting;
-    protected $DomainToServiceType = [];
+    private $cdnNetworkService;
+
+    private $userEntities;
+
+    private $userDomainList = [];
+
+    protected $setting;
+
+    protected $domainToServiceType = [];
 
     /**
      * @Author  : steatng
+     *
      * @DateTime: 2024/5/30 下午5:38
      */
     public function handle()
     {
         $this->startInfo(self::class);
 
-        # 取得列表
-        $ExecuteScheduleEntities =
+        // 取得列表
+        $executeScheduleEntities =
             app(ExecuteScheduleEntity::class)
-            ->where("status", "initial")
-            ->get();
+                ->where('status', 'initial')
+                ->get();
 
-        # 取得設定
-        $this->Setting = app(SettingEntity::class)
+        // 取得設定
+        $this->setting = app(SettingEntity::class)
             ->find(1);
 
-        # 取得User
-        $this->UserEntities =
+        // 取得User
+        $this->userEntities =
             app(UserEntity::class)
-            ->whereIn("id", $ExecuteScheduleEntities->pluck("user_id")->toArray())
-            ->get()
-            ->keyBy("id");
+                ->whereIn('id', $executeScheduleEntities->pluck('user_id')->toArray())
+                ->get()
+                ->keyBy('id');
 
-        $ExecuteScheduleEntities->each(function ($ExecuteScheduleEntity) {
-            $this->startInfo(sprintf('ExecuteScheduleEntity id = %s', $ExecuteScheduleEntity->id));
-            $this->DomainToServiceType = [];
-            # 修改執行時間
-            // $ExecuteScheduleEntity->update(["process_time_start" => now()->toDateTimeString(), "status" => "in progress"]);
-            //            $ExecuteScheduleEntity->update(["status" => "initial"]);
+        $executeScheduleEntities->each(function ($executeScheduleEntity) {
+            $this->startInfo(sprintf('ExecuteScheduleEntity id = %s', $executeScheduleEntity->id));
+            $this->domainToServiceType = [];
+            // 修改執行時間
+            // $executeScheduleEntity->update(["process_time_start" => now()->toDateTimeString(), "status" => "in progress"]);
+            // $executeScheduleEntity->update(["status" => "initial"]);
 
-            $this->initCdnNetworkService($ExecuteScheduleEntity->user_id);
+            $this->initCdnNetworkService($executeScheduleEntity->user_id);
 
             $controlGroupByDomain = $this->getCdnNetworkService()->getDomainListOfControlGroup();
-            # 取得 Domain List
-            foreach ($this->getDomainList($ExecuteScheduleEntity->user_id) as $data) {
-                $this->DomainToServiceType[$data['domain-name']] = $data['service-type'];
+            // 取得 Domain List
+            foreach ($this->getDomainList($executeScheduleEntity->user_id) as $data) {
+                $this->domainToServiceType[$data['domain-name']] = $data['service-type'];
             }
-            # 500 個一組
-            $UserDomainLists = array_chunk(array_keys($this->DomainToServiceType), Arr::get($this->Setting, 'domain_list_chuck', 500));
+            // 500 個一組
+            $userDomainLists = array_chunk(array_keys($this->domainToServiceType), Arr::get($this->setting, 'domain_list_chuck', 500));
 
-            foreach ($UserDomainLists as $DomainLists) {
-                $this->startInfo("getDownloadLinkByDomains");
-                # 取得下載連結
-                $DownloadLinkLists =
+            foreach ($userDomainLists as $domainLists) {
+                $this->startInfo('getDownloadLinkByDomains');
+                // 取得下載連結
+                $downloadLinkLists =
                     $this->getCdnNetworkService()
-                    ->getDownloadLinkByDomains(
-                        $DomainLists,
-                        [
-                            Arr::get($ExecuteScheduleEntity, "log_time_start"),
-                            Arr::get($ExecuteScheduleEntity, "log_time_end")
-                        ]
-                    );
-                $this->endInfo("getDownloadLinkByDomains");
+                        ->getDownloadLinkByDomains(
+                            $domainLists,
+                            [
+                                Arr::get($executeScheduleEntity, 'log_time_start'),
+                                Arr::get($executeScheduleEntity, 'log_time_end'),
+                            ]
+                        );
+                $this->endInfo('getDownloadLinkByDomains');
 
-                if ($DownloadLinkLists != false && empty($DownloadLinkLists['logs']) == false) {
-                    # 儲存下載連結
-                    $InsertData = [];
-                    foreach ($DownloadLinkLists['logs'] as $DomainLogData) {
+                if ($downloadLinkLists != false && empty($downloadLinkLists['logs']) == false) {
+                    // 儲存下載連結
+                    $insertData = [];
+                    foreach ($downloadLinkLists['logs'] as $DomainLogData) {
                         foreach ($DomainLogData['files'] as $DownloadLinks) {
-                            $InsertData[] = [
-                                "user_id" => $ExecuteScheduleEntity->user_id,
-                                "url" => Arr::get($DownloadLinks, 'logUrl'),
-                                "domain_name" => $DomainLogData["domainName"],
-                                "service_type" => Arr::get($this->DomainToServiceType, $DomainLogData["domainName"], null),
-                                'control_group_name' => !empty($controlGroupByDomain[$DomainLogData["domainName"]]) ? $controlGroupByDomain[$DomainLogData["domainName"]]['controlGroupName'] : null,
-                                'control_group_code' => !empty($controlGroupByDomain[$DomainLogData["domainName"]]) ? $controlGroupByDomain[$DomainLogData["domainName"]]['controlGroupCode'] : null,
-                                "log_time_start" => $this->handleDateTimeFormat(Arr::get($DownloadLinks, 'dateFrom')),
-                                "log_time_end" => $this->handleDateTimeFormat(Arr::get($DownloadLinks, 'dateTo')),
-                                "type" => "initial",
-                                "status" => "initial"
+                            $insertData[] = [
+                                'user_id' => $executeScheduleEntity->user_id,
+                                'url' => Arr::get($DownloadLinks, 'logUrl'),
+                                'domain_name' => $DomainLogData['domainName'],
+                                'service_type' => Arr::get($this->domainToServiceType, $DomainLogData['domainName'], null),
+                                'control_group_name' => !empty($controlGroupByDomain[$DomainLogData['domainName']]) ? $controlGroupByDomain[$DomainLogData['domainName']]['controlGroupName'] : null,
+                                'control_group_code' => !empty($controlGroupByDomain[$DomainLogData['domainName']]) ? $controlGroupByDomain[$DomainLogData['domainName']]['controlGroupCode'] : null,
+                                'log_time_start' => $this->handleDateTimeFormat(Arr::get($DownloadLinks, 'dateFrom')),
+                                'log_time_end' => $this->handleDateTimeFormat(Arr::get($DownloadLinks, 'dateTo')),
+                                'type' => 'initial',
+                                'status' => 'initial',
                             ];
                         }
                         app(DownloadEntity::class)
-                            ->insert($InsertData);
+                            ->insert($insertData);
                     }
                 } else {
-                    $ExecuteScheduleEntity->update(["status" => "failure"]);
-                    $this->errorInfo("getDownloadLinkByDomains 異常");
+                    $executeScheduleEntity->update(['status' => 'failure']);
+                    $this->errorInfo('getDownloadLinkByDomains 異常');
                 }
                 sleep(1);
             }
 
-            #釋放不需要的資料
-            unset($this->UserDomainList[$ExecuteScheduleEntity->user_id]);
-            $this->endInfo(sprintf('ExecuteScheduleEntity id = %s', $ExecuteScheduleEntity->id));
+            //釋放不需要的資料
+            unset($this->userDomainList[$executeScheduleEntity->user_id]);
+            $this->endInfo(sprintf('ExecuteScheduleEntity id = %s', $executeScheduleEntity->id));
             sleep(5);
         });
 
@@ -134,72 +143,71 @@ class HandleExecuteScheduleCommand extends Command
     }
 
     /**
-     * @param $user_id
-     *
      * @return $this
+     *
      * @Author  : steatng
+     *
      * @DateTime: 2024/5/30 下午5:38
      */
     private function initCdnNetworkService($user_id)
     {
-        $UserEntity = $this->UserEntities->get($user_id);
+        $userEntity = $this->userEntities->get($user_id);
 
-        $this->CdnNetworkService =
+        $this->cdnNetworkService =
             app(CdnNetworkService::class)
-            ->setAccount(Arr::get($UserEntity, 'tswd_account'))
-            ->setToken(Arr::get($UserEntity, 'tswd_token'));
+                ->setAccount(Arr::get($userEntity, 'tswd_account'))
+                ->setToken(Arr::get($userEntity, 'tswd_token'));
 
         return $this;
     }
 
     /**
-     * @return \App\Models\CdnNetworks\Services\CdnNetworkService
      * @Author  : steatng
+     *
      * @DateTime: 2024/5/30 下午5:38
      */
     private function getCdnNetworkService(): CdnNetworkService
     {
-        return $this->CdnNetworkService;
+        return $this->cdnNetworkService;
     }
 
     /**
-     * @param $user_id
-     *
      * @return array|mixed
+     *
      * @Author  : steatng
+     *
      * @DateTime: 2024/5/30 下午5:38
      */
     private function getDomainList($user_id)
     {
-        if (isset($this->UserDomainList[$user_id])) {
-            return $this->UserDomainList[$user_id];
+        if (isset($this->userDomainList[$user_id])) {
+            return $this->userDomainList[$user_id];
         }
 
         $this->startInfo(debug_backtrace()[0]['function']);
 
-        $DomainLists =
+        $domainLists =
             $this
-            ->getCdnNetworkService()
-            ->getDomainList();
+                ->getCdnNetworkService()
+                ->getDomainList();
 
-        if (empty($DomainLists) == true) {
-            $this->errorInfo(debug_backtrace()[0]['function'] . " 為空值");
+        if (empty($domainLists) == true) {
+            $this->errorInfo(debug_backtrace()[0]['function'] . ' 為空值');
             exit;
         } else {
             $this->endInfo(debug_backtrace()[0]['function']);
         }
 
+        $this->userDomainList[$user_id] = $domainLists;
 
-        $this->UserDomainList[$user_id] = $DomainLists;
-
-        return $DomainLists;
+        return $domainLists;
     }
 
     /**
-     * @param $dateString
-     *
      * @return string
+     *
      * @Author  : steatng
+     *
      * @DateTime: 2024/5/30 下午5:38
      */
     private function handleDateTimeFormat($dateString)
@@ -219,53 +227,52 @@ class HandleExecuteScheduleCommand extends Command
     }
 
     /**
-     * @param $name
-     *
      * @return $this
+     *
      * @Author  : steatng
+     *
      * @DateTime: 2024/5/30 下午5:39
      */
     private function startInfo($name)
     {
         $this->info(str_replace(
-            ["{class}", "{date_time}"],
+            ['{class}', '{date_time}'],
             [$name, now()->toDateTimeString()],
-            "{class} 開始執行 {date_time}"
+            '{class} 開始執行 {date_time}'
         ));
 
         return $this;
     }
 
     /**
-     * @param $name
-     *
      * @return $this
+     *
      * @Author  : steatng
+     *
      * @DateTime: 2024/5/30 下午5:39
      */
     private function endInfo($name)
     {
         $this->info(str_replace(
-            ["{class}", "{date_time}"],
+            ['{class}', '{date_time}'],
             [$name, now()->toDateTimeString()],
-            "{class} 執行結束 {date_time}"
+            '{class} 執行結束 {date_time}'
         ));
 
         return $this;
     }
 
     /**
-     * @param $name
-     *
      * @Author  : steatng
+     *
      * @DateTime: 2024/5/30 下午5:39
      */
     private function errorInfo($name)
     {
         $this->error(str_replace(
-            ["{class}", "{date_time}"],
+            ['{class}', '{date_time}'],
             [$name, now()->toDateTimeString()],
-            "{class} 執行結束 {date_time}"
+            '{class} 執行結束 {date_time}'
         ));
     }
 }

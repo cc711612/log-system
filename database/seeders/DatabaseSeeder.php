@@ -2,13 +2,10 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-
 use App\Models\Settings\Entities\SettingEntity;
 use App\Models\Users\Entities\UserEntity;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-// use Illuminate\Support\Facades\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -23,7 +20,7 @@ class DatabaseSeeder extends Seeder
             'display_name' => 'Admin',
             'product_type' => 'tswd',
             'account' => 'admin',
-            'password' =>  Hash::make(
+            'password' => Hash::make(
                 '15456123'
             ),
             'tswd_account' => config('services.tswd.account'),
