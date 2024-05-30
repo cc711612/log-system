@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_idx')->comment('User Index')->index(); // 外鍵 User Index，必須且索引
             $table->timestamp('log_time_start')->nullable()->comment('Log Time Start'); // 日誌時間開始，必須
             $table->timestamp('log_time_end')->nullable()->comment('Log Time End'); // 日誌時間結束，必須
-            $table->string('status', 10)->comment('Status'); // 狀態，必須
+            $table->string('status', 11)->comment('Status'); // 狀態，必須
             $table->timestamp('process_time_start')->nullable()->comment('Process Time Start'); // 處理時間開始，必須，默認當前時間
             $table->timestamp('process_time_end')->nullable()->comment('Process Time End'); // 處理時間結束，必須，默認當前時間
             $table->timestamp('created_at')->useCurrent()->comment('Created At'); // 創建時間，必須，默認當前時間
