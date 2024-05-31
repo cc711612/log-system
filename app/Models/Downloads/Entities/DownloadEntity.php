@@ -14,6 +14,7 @@ class DownloadEntity extends Model
 
     protected $fillable = [
         'user_id',
+        'execute_schedule_id',
         'url',
         'domain_name',
         'service_type',
