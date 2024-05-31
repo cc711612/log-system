@@ -15,6 +15,8 @@ services:
             - ./main_crontabs/schedule:/etc/crontabs/schedule # alpine crontab 使用
             - ./main_crontabs/root:/etc/crontabs/root # alpine crontab 使用
         command: /bin/sh -c "/entrypoint.sh"
+        dns:
+            - 8.8.8.8
     nginx:
         image: nginx
         container_name: ${PROJECT_NAME}-nginx
