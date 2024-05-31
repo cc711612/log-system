@@ -7,6 +7,7 @@ use App\Exceptions\LogProcessException;
 use App\Helpers\CDNNetwork;
 use App\Helpers\LogParser;
 use App\Models\Downloads\Entities\DownloadEntity;
+use App\Models\ExecuteSchedules\Entities\ExecuteScheduleEntity;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -167,6 +168,7 @@ class CdnNetworkService
             $path = $parsedUrl['path'];
             // 從路徑中提取文件名
             $fileName = basename($path);
+            $download = $this->updateDownLoad($download, ["type" => "download"]);
             $response = Http::get($downloadLink);
             if ($response->successful()) {
                 // 將日誌內容存儲到本地文件
@@ -176,6 +178,7 @@ class CdnNetworkService
                 $fileInfo = pathinfo($fileName);
                 // 如果是.gz格式，則解壓縮
                 if ($fileInfo['extension'] == 'gz') {
+                    $download = $this->updateDownLoad($download, ["type" => "gunzip"]);
                     $uncompressedData = gzdecode($compressedData);
                     $uncompressedFileName = $fileInfo['filename'];
                     // 存儲解壓後的文件
@@ -190,16 +193,36 @@ class CdnNetworkService
                 // 按行分割日誌
                 $logLines = array_filter(explode("\n", $uncompressedLogs));
                 // 解析每一行日誌條目
+                $download = $this->updateDownLoad($download, ["type" => "parse"]);
                 foreach ($logLines as $logLine) {
-                    $log = $logParser->parseLogEntry($logLine, $download->service_type);
-                    array_push($logs, $log);
+                    try {
+                        $log = $logParser->parseLogEntry($logLine, $download->service_type);
+                        array_push($logs, $log);
+                    } catch (\Exception $exception) {
+                        Log::error($download->service_type." download->service_type ".$logLine);
+                    }
                 }
                 // 批量插入數據庫或其他操作
                 if (!empty($logs)) {
                     Log::info('message:解析日誌成功:', $logs);
+                    $download = $this->updateDownLoad($download, ["type" => "write"]);
                     $influxDBService->insertLogs($logs);
-                    $download->status = 'success';
-                    $download->save();
+                    $download = $this->updateDownLoad($download, ["type" => "done", "status" => "success"]);
+
+                    # 檢查執行的 execute_schedule_id 是否為最後一筆
+                    $execute_schedule_count =
+                        app(DownloadEntity::class)
+                            ->where("execute_schedule_id", $download->execute_schedule_id)
+                            ->count();
+
+                    if($execute_schedule_count == 0){
+                        app(ExecuteScheduleEntity::class)
+                            ->find($download->execute_schedule_id)
+                            ->update([
+                                'status' => "success",
+                                'process_time_end' => now()->toDateTimeString()
+                            ]);
+                    }
                 }
                 // 刪除解壓後的文件
                 Storage::disk($this->driver)->delete($uncompressedFileName);
@@ -227,5 +250,25 @@ class CdnNetworkService
             $roundedTime->format('Y-m-d H:i:00'),
             $roundedTime->addMinutes(5)->format('Y-m-d H:i:00'),
         ];
+    }
+
+    /**
+     * @param \App\Models\Downloads\Entities\DownloadEntity $downloadEntity
+     * @param array                                         $params
+     *
+     * @return \App\Models\Downloads\Entities\DownloadEntity
+     * @Author  : steatng
+     * @DateTime: 2024/5/31 下午9:22
+     */
+    private function updateDownLoad(DownloadEntity $downloadEntity, array $params) : DownloadEntity
+    {
+        foreach ($params as $index => $value)
+        {
+            $downloadEntity->$index = $value;
+        }
+
+        $downloadEntity->save();
+
+        return $downloadEntity;
     }
 }

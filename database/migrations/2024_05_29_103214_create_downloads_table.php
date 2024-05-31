@@ -25,7 +25,7 @@ return new class extends Migration
             $table->timestamp('log_time_start')->nullable()->comment('Log Time Start'); // 日誌時間開始，必須
             $table->timestamp('log_time_end')->nullable()->comment('Log Time End'); // 日誌時間結束，必須
             $table->string('type', 10)->comment('Type'); // 類型，必須
-            $table->string('status', 10)->comment('Status'); // 狀態，必須
+            $table->string('status', 11)->comment('Status'); // 狀態，必須
             $table->timestamp('created_at')->useCurrent()->comment('Created At'); // 創建時間，默認當前時間
             $table->timestamp('updated_at')->useCurrent()->comment('Updated At'); // 更新時間，默認當前時間
             $table->softDeletes()->comment('Deleted At'); // 軟刪除時間
