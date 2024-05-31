@@ -50,7 +50,7 @@ class LogNoticeNotification extends Notification
     public function toSlack($notifiable)
     {
         $lines = [
-            'Test System',
+            config('app.name') . ' 系統通知',
             $this->message,
         ];
 
