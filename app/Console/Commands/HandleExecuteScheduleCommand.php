@@ -110,8 +110,10 @@ class HandleExecuteScheduleCommand extends Command
                 $this->endInfo('getDownloadLinkByDomains');
 
                 if ($downloadLinkLists != false && empty($downloadLinkLists['logs']) == false) {
+                    $this->startInfo('開始儲存 下載連結');
                     // 儲存下載連結
                     $insertData = [];
+                    $count = 1;
                     foreach ($downloadLinkLists['logs'] as $DomainLogData) {
                         foreach ($DomainLogData['files'] as $DownloadLinks) {
                             $insertData[] = [
@@ -127,9 +129,13 @@ class HandleExecuteScheduleCommand extends Command
                                 'status' => 'initial',
                             ];
                         }
+                        $this->startInfo(sprintf('第 %s 次 insert 共 %s 筆',$count,count($insertData)));
                         app(DownloadEntity::class)
                             ->insert($insertData);
+                        $insertData = [];
+                        $count++;
                     }
+                    $this->startInfo('開始儲存 下載連結');
                 } else {
 //                    $executeScheduleEntity->update(['status' => 'failure']);
                     $this->errorInfo('getDownloadLinkByDomains 異常');
