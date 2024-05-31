@@ -147,8 +147,9 @@ class CdnNetworkService
     /**
      * 根據下載鏈接處理日誌
      *
-     * @param DownloadEntity $download
-     * @return void
+     * @param \App\Models\Downloads\Entities\DownloadEntity $download
+     *
+     * @throws \App\Exceptions\LogFileExtensionException
      */
     public function processLogByDownload(DownloadEntity $download)
     {

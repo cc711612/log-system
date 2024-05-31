@@ -33,6 +33,7 @@ class HandleDownloadJob implements ShouldQueue
     }
 
     /**
+     * @throws \App\Exceptions\LogFileExtensionException
      * Execute the job.
      *
      * @return void
