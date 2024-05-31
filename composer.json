@@ -10,6 +10,7 @@
         "influxdata/influxdb-client-php": "^3.5",
         "laravel/framework": "^9.19",
         "laravel/sanctum": "^3.0",
+        "laravel/slack-notification-channel": "^3.2",
         "laravel/telescope": "^5.0",
         "laravel/tinker": "^2.7",
         "nyholm/psr7": "^1.8",

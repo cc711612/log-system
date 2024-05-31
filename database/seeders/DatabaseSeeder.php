@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make(
                 '15456123'
             ),
+            'email' => 'cc711612@gmail.com',
             'tswd_account' => config('services.tswd.account'),
             'tswd_token' => config('services.tswd.token'),
             'cf_account' => null,
@@ -30,6 +31,8 @@ class DatabaseSeeder extends Seeder
             'influx_db_connection' => config('influxdb.host'),
             'influx_db_bucket' => config('influxdb.bucket'),
             'influx_db_token' => config('influxdb.token'),
+            'influx_db_org' => config('influxdb.org'),
+            'slack_webhook_url' => env('SLACK_WEBHOOK_URL'),
         ]);
 
         app(SettingEntity::class)->create([

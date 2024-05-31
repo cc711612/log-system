@@ -2,6 +2,7 @@
 
 namespace App\Models\ExecuteSchedules\Entities;
 
+use App\Models\Users\Entities\UserEntity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -30,4 +31,9 @@ class ExecuteScheduleEntity extends Model
         'process_time_start',
         'process_time_end',
     ];
+
+    public function users()
+    {
+        return $this->belongsTo(UserEntity::class, 'user_id', 'id');
+    }
 }
