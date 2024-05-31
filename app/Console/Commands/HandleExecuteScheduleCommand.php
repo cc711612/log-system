@@ -135,7 +135,6 @@ class HandleExecuteScheduleCommand extends Command
                                     ->create($insertData);
 
                             HandleDownloadJob::dispatch($DownloadEntity->id);
-                            break 3;
                         }
                         $this->startInfo(sprintf('第 %s 次 insert 共 %s 筆',$count,count($DomainLogData['files'])));
 //                        app(DownloadEntity::class)
