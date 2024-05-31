@@ -169,7 +169,7 @@ class CdnNetworkService
             // 從路徑中提取文件名
             $fileName = basename($path);
             $download = $this->updateDownLoad($download, ["type" => "download"]);
-            $response = Http::get($downloadLink);
+            $response = Http::withHeaders(['Accept-Encoding' => 'gzip,deflate'])->get($downloadLink);
             if ($response->successful()) {
                 // 將日誌內容存儲到本地文件
                 Storage::disk($this->driver)->put($fileName, $response->body());
