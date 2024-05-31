@@ -124,14 +124,22 @@ class CdnNetworkService
         $result = [];
         foreach ($controlGroups as $controlGroup) {
             foreach ($controlGroup['domainList'] as $domain) {
-                $result[$domain] = [
+                $result[$domain][] = [
                     'controlGroupCode' => $controlGroup['controlGroupCode'],
                     'controlGroupName' => $controlGroup['controlGroupName'],
                     'domain' => $domain,
                 ];
             }
         }
-
+        // 整理資料
+        foreach ($result as $domain => $values) {
+            $controlGroupCodes = array_unique(array_column($values, 'controlGroupCode'));
+            $controlGroupName = array_unique(array_column($values, 'controlGroupName'));
+            $result[$domain] = [
+                'controlGroupCode' => implode(",", $controlGroupCodes),
+                'controlGroupName' => implode(",", $controlGroupName)
+            ];
+        }
         return $result;
     }
 
