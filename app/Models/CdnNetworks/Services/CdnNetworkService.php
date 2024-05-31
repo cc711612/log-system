@@ -155,7 +155,11 @@ class CdnNetworkService
          * @var LogParser
          */
         $logParser = app(LogParser::class);
-
+        /**
+         * @var InfluxDBService
+         */
+        $influxDBService = new InfluxDBService($download->user->influx_db_connection, $download->user->influx_db_token, $download->user->influx_db_org, $download->user->influx_db_bucket);
+        $logs = [];
         try {
             $downloadLink = $download->url;
             $parsedUrl = parse_url($downloadLink);
@@ -185,14 +189,15 @@ class CdnNetworkService
                 $uncompressedLogs = Storage::disk($this->driver)->get($uncompressedFileName);
                 // 按行分割日誌
                 $logLines = array_filter(explode("\n", $uncompressedLogs));
-                $logs = [];
                 // 解析每一行日誌條目
                 foreach ($logLines as $logLine) {
-                    array_push($logs, $logParser->parseLogEntry($logLine, $download->service_type));
+                    $log = $logParser->parseLogEntry($logLine, $download->service_type);
+                    array_push($logs, $log);
                 }
                 // 批量插入數據庫或其他操作
                 if (!empty($logs)) {
                     Log::info('message:解析日誌成功:', $logs);
+                    $influxDBService->insertLogs($logs);
                     $download->status = 'success';
                     $download->save();
                 }

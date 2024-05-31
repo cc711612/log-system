@@ -2,6 +2,8 @@
 
 namespace App\Models\Users\Entities;
 
+use App\Models\Downloads\Entities\DownloadEntity;
+use App\Models\ExecuteSchedules\Entities\ExecuteScheduleEntity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -36,4 +38,14 @@ class UserEntity extends Model
         'updated_at',
         'deleted_at',
     ];
+
+    public function downloads()
+    {
+        return $this->hasMany(DownloadEntity::class, 'user_id', 'id');
+    }
+
+    public function executeSchedules()
+    {
+        return $this->hasMany(ExecuteScheduleEntity::class, 'user_id', 'id');
+    }
 }
