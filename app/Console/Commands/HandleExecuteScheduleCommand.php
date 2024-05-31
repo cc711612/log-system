@@ -149,7 +149,7 @@ class HandleExecuteScheduleCommand extends Command
      *
      * @DateTime: 2024/5/30 下午5:38
      */
-    private function initCdnNetworkService($user_id)
+    private function initCdnNetworkService(int $user_id)
     {
         $userEntity = $this->userEntities->get($user_id);
 
@@ -172,13 +172,15 @@ class HandleExecuteScheduleCommand extends Command
     }
 
     /**
+     * @param int $user_id
+     *
      * @return array|mixed
      *
      * @Author  : steatng
      *
      * @DateTime: 2024/5/30 下午5:38
      */
-    private function getDomainList($user_id)
+    private function getDomainList(int $user_id)
     {
         if (isset($this->userDomainList[$user_id])) {
             return $this->userDomainList[$user_id];
