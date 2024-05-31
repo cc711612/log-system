@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('product_type', 10)->nullable()->comment('CDN種類');
             $table->string('account', 50)->comment('登入帳號');
             $table->string('password')->comment('加密後密碼');
+            $table->string('email', 50)->comment('電子郵件');
             $table->string('tswd_account', 50)->nullable()->comment('TSWD帳號');
             $table->string('tswd_token', 255)->nullable()->comment('TSWD金鑰');
             $table->string('cf_account', 50)->nullable()->comment('CF帳號');
@@ -27,6 +28,7 @@ return new class extends Migration
             $table->string('influx_db_bucket', 255)->nullable()->comment('InfluxDB Bucket Name');
             $table->string('influx_db_token', 255)->nullable()->comment('InfluxDB Token');
             $table->string('influx_db_org', 255)->nullable()->comment('InfluxDB Org');
+            $table->text('slack_webhook_url')->nullable()->comment('Slack Webhook URL');
             $table->timestamps(); // Laravel auto adds created_at and updated_at columns
             $table->softDeletes()->comment('Deleted At');
         });
