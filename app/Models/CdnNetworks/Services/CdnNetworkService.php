@@ -159,7 +159,7 @@ class CdnNetworkService
         /**
          * @var InfluxDBService
          */
-        $influxDBService = new InfluxDBService($download->user->influx_db_connection, $download->user->influx_db_token, $download->user->influx_db_org, $download->user->influx_db_bucket);
+        $influxDBService = new InfluxDBService($download->users->influx_db_connection, $download->users->influx_db_token, $download->users->influx_db_org, $download->users->influx_db_bucket);
         $logs = [];
         try {
             $downloadLink = $download->url;
@@ -204,7 +204,7 @@ class CdnNetworkService
                 }
                 // 批量插入數據庫或其他操作
                 if (!empty($logs)) {
-                    Log::info('message:解析日誌成功:', $logs);
+//                    Log::info('message:解析日誌成功:', $logs);
                     $download = $this->updateDownLoad($download, ["type" => "write"]);
                     $influxDBService->insertLogs($logs);
                     $download = $this->updateDownLoad($download, ["type" => "done", "status" => "success"]);
@@ -213,6 +213,7 @@ class CdnNetworkService
                     $execute_schedule_count =
                         app(DownloadEntity::class)
                             ->where("execute_schedule_id", $download->execute_schedule_id)
+                            ->where("type", "!=", "done")
                             ->count();
 
                     if($execute_schedule_count == 0){
