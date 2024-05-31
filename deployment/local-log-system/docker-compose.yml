@@ -14,6 +14,8 @@ services:
             - ./entrypoint.sh:/entrypoint.sh
             - ./main_crontabs/schedule:/etc/crontabs/schedule # alpine crontab 使用
             - ./main_crontabs/root:/etc/crontabs/root # alpine crontab 使用
+            - ./supervisor/supervisor.d:/etc/supervisor.d
+            - ./supervisor/supervisord.conf:/etc/supervisord.conf
         command: /bin/sh -c "/entrypoint.sh"
         dns:
             - 8.8.8.8
