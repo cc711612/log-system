@@ -20,8 +20,8 @@ return new class extends Migration
             $table->text('url')->comment('Download URL'); // 下載 URL，必須
             $table->string('domain_name')->nullable()->comment('Domain'); // 域名
             $table->string('service_type')->nullable()->comment('Service Type'); // 服務類型
-            $table->string('control_group_name')->nullable()->comment('GC Name'); // GC 名稱
-            $table->string('control_group_code')->nullable()->comment('GC ID'); // GC 代號
+            $table->text('control_group_name')->nullable()->comment('GC Name'); // GC 名稱
+            $table->text('control_group_code')->nullable()->comment('GC ID'); // GC 代號
             $table->timestamp('log_time_start')->nullable()->comment('Log Time Start'); // 日誌時間開始，必須
             $table->timestamp('log_time_end')->nullable()->comment('Log Time End'); // 日誌時間結束，必須
             $table->string('type', 10)->comment('Type'); // 類型，必須

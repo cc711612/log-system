@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\HandleDownloadJob;
 use App\Models\CdnNetworks\Services\CdnNetworkService;
 use App\Models\Downloads\Entities\DownloadEntity;
 use App\Models\ExecuteSchedules\Entities\ExecuteScheduleEntity;
@@ -111,28 +112,35 @@ class HandleExecuteScheduleCommand extends Command
                 if ($downloadLinkLists != false && empty($downloadLinkLists['logs']) == false) {
                     $this->startInfo('開始儲存 下載連結');
                     // 儲存下載連結
-                    $insertData = [];
+//                    $insertData = [];
                     $count = 1;
                     foreach ($downloadLinkLists['logs'] as $DomainLogData) {
                         foreach ($DomainLogData['files'] as $DownloadLinks) {
-                            $insertData[] = [
-                                'user_id' => $executeScheduleEntity->user_id,
-                                'execute_schedule_id' => $executeScheduleEntity->id,
-                                'url' => Arr::get($DownloadLinks, 'logUrl'),
-                                'domain_name' => $DomainLogData['domainName'],
-                                'service_type' => Arr::get($this->domainToServiceType, $DomainLogData['domainName'], null),
-                                'control_group_name' => !empty($controlGroupByDomain[$DomainLogData['domainName']]) ? $controlGroupByDomain[$DomainLogData['domainName']]['controlGroupName'] : null,
-                                'control_group_code' => !empty($controlGroupByDomain[$DomainLogData['domainName']]) ? $controlGroupByDomain[$DomainLogData['domainName']]['controlGroupCode'] : null,
-                                'log_time_start' => $this->handleDateTimeFormat(Arr::get($DownloadLinks, 'dateFrom')),
-                                'log_time_end' => $this->handleDateTimeFormat(Arr::get($DownloadLinks, 'dateTo')),
-                                'type' => 'initial',
-                                'status' => 'initial',
-                            ];
+                            $insertData =
+                                [
+                                    'user_id' => $executeScheduleEntity->user_id,
+                                    'execute_schedule_id' => $executeScheduleEntity->id,
+                                    'url' => Arr::get($DownloadLinks, 'logUrl'),
+                                    'domain_name' => $DomainLogData['domainName'],
+                                    'service_type' => Arr::get($this->domainToServiceType, $DomainLogData['domainName'], null),
+                                    'control_group_name' => !empty($controlGroupByDomain[$DomainLogData['domainName']]) ? $controlGroupByDomain[$DomainLogData['domainName']]['controlGroupName'] : null,
+                                    'control_group_code' => !empty($controlGroupByDomain[$DomainLogData['domainName']]) ? $controlGroupByDomain[$DomainLogData['domainName']]['controlGroupCode'] : null,
+                                    'log_time_start' => $this->handleDateTimeFormat(Arr::get($DownloadLinks, 'dateFrom')),
+                                    'log_time_end' => $this->handleDateTimeFormat(Arr::get($DownloadLinks, 'dateTo')),
+                                    'type' => 'initial',
+                                    'status' => 'initial',
+                                ];
+                            $DownloadEntity =
+                                app(DownloadEntity::class)
+                                    ->create($insertData);
+
+                            HandleDownloadJob::dispatch($DownloadEntity->id);
+                            break 3;
                         }
-                        $this->startInfo(sprintf('第 %s 次 insert 共 %s 筆',$count,count($insertData)));
-                        app(DownloadEntity::class)
-                            ->insert($insertData);
-                        $insertData = [];
+                        $this->startInfo(sprintf('第 %s 次 insert 共 %s 筆',$count,count($DomainLogData['files'])));
+//                        app(DownloadEntity::class)
+//                            ->insert($insertData);
+//                        $insertData = [];
                         $count++;
                     }
                     $this->startInfo('開始儲存 下載連結');
