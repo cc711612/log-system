@@ -27,7 +27,7 @@ class InfluxDB
 
     /**
      * Create a new data point in the InfluxDB database.
-     *
+     *x
      * @param  string  $measurement  The name of the measurement.
      * @param  array  $fields  The fields of the data point.
      * @param  array  $tags  The tags associated with the data point. (optional)
@@ -44,6 +44,35 @@ class InfluxDB
          */
         $point = new Point($measurement, $fields, $tags, $timestamp);
         $writeApi->write([$point], WritePrecision::NS); // 將 $precision 參數設置為 WritePrecision::NS
+        $writeApi->close();
+    }
+
+    /**
+     * Create multiple data points in the InfluxDB database.
+     *
+     * @param  array  $dataPoints  An array of data points to create.
+     */
+    public function createBatch(array $dataPoints): void
+    {
+        /**
+         * @var WriteApi
+         */
+        $writeApi = $this->client->createWriteApi();
+        $points = [];
+
+        foreach ($dataPoints as $data) {
+            $measurement = $data['measurement'];
+            $fields = $data['fields'];
+            $tags = $data['tags'] ?? [];
+            $timestamp = $data['timestamp'] ?? null;
+
+            /**
+             * @var Point
+             */
+            $points[] = new Point($measurement, $fields, $tags, $timestamp);
+        }
+
+        $writeApi->write($points, WritePrecision::NS); // Batch write with precision set to nanoseconds
         $writeApi->close();
     }
 

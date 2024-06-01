@@ -31,38 +31,36 @@ class InfluxDBService
 
         // 測量名稱
         $measurement = 'Service Type';
-        foreach ($logs as $log) {
-            // 將 $log 陣列中的字段值 'size', '回源時間', '開始回源到回源結束的時間' 存入 fields 中
-            $fields = Arr::only($log, ['size', 'rt']);
-
-            // 獲取 'rt' 字段的值並轉換為納秒
-            if (isset($log['rt'])) {
-                $rt = $log['rt'];
-                $timestamp = $this->convertToNanoseconds($rt);
-            } else {
-                // 如果 'rt' 不存在，使用當前時間
-                $timestamp = time() * 1000000000; // 當前時間轉換為納秒
-            }
-
-            // 將 $log 陣列中的標籤值提取出來
-            $tags = Arr::only($log, [
-                'host',        // 客戶端IP
-                'uident',      // 用戶識別
-                'uname',       // 用戶名
-                'method',      // 請求方式
-                'url',         // 請求完整uri
-                'rp',          // 響應的HTTP版本號
-                'code',        // HTTP服務狀態碼
-                'referer',     // 請求頭referer
-                'ua',          // 請求頭UA
-                'cache',       // 緩存狀態
-                'aty',         // 攻擊類型
-                'ra',          // 防護操作
-                'Content-Type' // 響應頭Content-Type
-            ]);
-
-            // 創建資料點
-            $influxDB->create($measurement, $fields, $tags, $timestamp);
+        $logs = array_map(function ($log) use ($measurement) {
+            return [
+                'measurement' => $measurement,
+                'fields' => Arr::only($log, [
+                    'size',
+                    'rt'
+                ]),
+                'tags' => Arr::only($log, [
+                    'host',
+                    'uident',
+                    'uname',
+                    'method',
+                    'url',
+                    'rp',
+                    'code',
+                    'referer',
+                    'ua',
+                    'cache',
+                    'aty',
+                    'ra',
+                    'Content-Type'
+                ]),
+                'timestamp' => isset($log['rt']) ? $this->convertToNanoseconds($log['rt']) : time() * 1000000000,
+            ];
+        }, $logs);
+        // 批次 5000 筆
+        $logChunks = array_chunk($logs, 5000);
+        foreach ($logChunks as $logs) {
+            // 創建批次
+            $influxDB->createBatch($logs);
         }
     }
 
