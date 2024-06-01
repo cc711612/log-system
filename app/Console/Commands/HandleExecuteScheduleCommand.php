@@ -80,7 +80,7 @@ class HandleExecuteScheduleCommand extends Command
             $this->domainToServiceType = [];
             // 修改執行時間
              $executeScheduleEntity->update(["process_time_start" => now()->toDateTimeString(), "status" => "in progress"]);
-            // $executeScheduleEntity->update(["status" => "initial"]);
+             $executeScheduleEntity->update(["status" => "initial"]);
 
             $this->initCdnNetworkService($executeScheduleEntity->user_id);
 

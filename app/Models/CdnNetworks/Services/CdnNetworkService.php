@@ -206,8 +206,11 @@ class CdnNetworkService
                 // 批量插入數據庫或其他操作
                 if (!empty($logs)) {
 //                    Log::info('message:解析日誌成功:', $logs);
+                    $log_lists = array_chunk($logs, 5000);
                     $download = $this->updateDownLoad($download, ["type" => "write"]);
-                    $influxDBService->insertLogs($logs);
+                    foreach ($log_lists as $log_data){
+                        $influxDBService->insertLogs($log_data);
+                    }
                     $download = $this->updateDownLoad($download, ["type" => "done", "status" => "success"]);
 
                     # 檢查執行的 execute_schedule_id 是否為最後一筆
