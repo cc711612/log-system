@@ -42,6 +42,8 @@ class HandleDownloadJob implements ShouldQueue
      */
     public function handle()
     {
+        ini_set('max_execution_time', $this->timeout);
+
         $DownloadEntity =
             app(DownloadEntity::class)
                 ->find($this->download_id);

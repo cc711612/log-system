@@ -201,20 +201,27 @@ class CdnNetworkService
                 $download = $this->updateDownLoad($download, ["type" => "parse"]);
                 print '迴圈開始';
                 print PHP_EOL;
-                $count = 1;
+                $count = 0;
                 $logs = [];
                 foreach (File::lines(Storage::disk($this->driver)->path($fileInfo['filename'])) as $line ){
+                    if($line == "") {
+                        break;
+                    }
                     try {
                         $log = $logParser->parseLogEntry($line, $download->service_type);
+                        $log = $influxDBService->handleLogFormat($log);
+
                         array_push($logs, $log);
                     } catch (\Exception $exception) {
                         Log::error($download->service_type." download->service_type ".$line);
+                        Log::error($exception->getMessage());
                     }
                     $count++;
                     if($count > 1000){
                         print '寫入influx db';
                         print PHP_EOL;
                         $influxDBService->insertLogs($logs);
+                        $count = 0;
                         $logs = [];
                     }
                 }

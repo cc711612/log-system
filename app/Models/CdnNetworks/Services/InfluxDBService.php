@@ -5,9 +5,11 @@ namespace App\Models\CdnNetworks\Services;
 use App\Helpers\InfluxDB;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
+use InfluxDB2\Point;
 
 class InfluxDBService
 {
+    public $measurement = 'Service Type';
 
     public function __construct(
         private string $host,
@@ -29,33 +31,6 @@ class InfluxDBService
             $this->bucket
         );
 
-        // 測量名稱
-        $measurement = 'Service Type';
-        $logs = array_map(function ($log) use ($measurement) {
-            return [
-                'measurement' => $measurement,
-                'fields' => Arr::only($log, [
-                    'size',
-                    'rt'
-                ]),
-                'tags' => Arr::only($log, [
-                    'host',
-                    'uident',
-                    'uname',
-                    'method',
-                    'url',
-                    'rp',
-                    'code',
-                    'referer',
-                    'ua',
-                    'cache',
-                    'aty',
-                    'ra',
-                    'Content-Type'
-                ]),
-                'timestamp' => isset($log['rt']) ? $this->convertToNanoseconds($log['rt']) : time() * 1000000000,
-            ];
-        }, $logs);
         // 批次 5000 筆
         $logChunks = array_chunk($logs, 5000);
         foreach ($logChunks as $logs) {
@@ -82,4 +57,49 @@ class InfluxDBService
             return time() * 1000000000;
         }
     }
+
+    public function handleLogFormat($log)
+    {
+        return
+            $this
+                ->handleDataPointFormat(
+                    [
+                        'measurement' => $this->measurement,
+                        'fields' => Arr::only($log, [
+                            'size',
+                            'rt'
+                        ]),
+                        'tags' => Arr::only($log, [
+                            'host',
+                            'uident',
+                            'uname',
+                            'method',
+                            'url',
+                            'rp',
+                            'code',
+                            'referer',
+                            'ua',
+                            'cache',
+                            'aty',
+                            'ra',
+                            'Content-Type'
+                        ]),
+                        'timestamp' => isset($log['rt']) ? $this->convertToNanoseconds($log['rt']) : time() * 1000000000,
+                    ]
+                );
+    }
+
+    public function handleDataPointFormat($data)
+    {
+        $measurement = $data['measurement'];
+        $fields = $data['fields'];
+        $tags = $data['tags'] ?? [];
+        $timestamp = $data['timestamp'] ?? null;
+
+        /**
+         * @var Point
+         */
+        return new Point($measurement, $fields, $tags, $timestamp);
+    }
+
 }

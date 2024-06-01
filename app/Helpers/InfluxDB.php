@@ -58,21 +58,8 @@ class InfluxDB
          * @var WriteApi
          */
         $writeApi = $this->client->createWriteApi();
-        $points = [];
 
-        foreach ($dataPoints as $data) {
-            $measurement = $data['measurement'];
-            $fields = $data['fields'];
-            $tags = $data['tags'] ?? [];
-            $timestamp = $data['timestamp'] ?? null;
-
-            /**
-             * @var Point
-             */
-            $points[] = new Point($measurement, $fields, $tags, $timestamp);
-        }
-
-        $writeApi->write($points, WritePrecision::NS); // Batch write with precision set to nanoseconds
+        $writeApi->write($dataPoints, WritePrecision::NS); // Batch write with precision set to nanoseconds
         $writeApi->close();
     }
 
