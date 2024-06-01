@@ -9,6 +9,7 @@ use App\Helpers\LogParser;
 use App\Models\Downloads\Entities\DownloadEntity;
 use App\Models\ExecuteSchedules\Entities\ExecuteScheduleEntity;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -161,7 +162,6 @@ class CdnNetworkService
          * @var InfluxDBService
          */
         $influxDBService = new InfluxDBService($download->users->influx_db_connection, $download->users->influx_db_token, $download->users->influx_db_org, $download->users->influx_db_bucket);
-        $logs = [];
         try {
             $downloadLink = $download->url;
             $parsedUrl = parse_url($downloadLink);
@@ -175,42 +175,57 @@ class CdnNetworkService
                 // 將日誌內容存儲到本地文件
                 Storage::disk($this->driver)->put($fileName, $response->body());
                 // 讀取日誌文件並分析
-                $compressedData = Storage::disk($this->driver)->get($fileName);
+                $zipFilePath = Storage::disk($this->driver)->path($fileName);
                 $fileInfo = pathinfo($fileName);
                 // 如果是.gz格式，則解壓縮
                 if ($fileInfo['extension'] == 'gz') {
                     $download = $this->updateDownLoad($download, ["type" => "gunzip"]);
-                    $uncompressedData = gzdecode($compressedData);
-                    $uncompressedFileName = $fileInfo['filename'];
-                    // 存儲解壓後的文件
-                    Storage::disk($this->driver)->put($uncompressedFileName, $uncompressedData);
-                    // 刪除壓縮文件
-                    Storage::disk($this->driver)->delete($fileName);
+                    system(sprintf("gunzip %s",$zipFilePath));
+//                    $uncompressedData = gzdecode($compressedData);
+//                    $uncompressedFileName = $fileInfo['filename'];
+//                    // 存儲解壓後的文件
+//                    Storage::disk($this->driver)->put($uncompressedFileName, $uncompressedData);
+//                    // 刪除壓縮文件
+//                    Storage::disk($this->driver)->delete($fileName);
                 } else {
                     throw new LogFileExtensionException('檔案格式錯誤，只支持.gz格式的日誌文件，檔案格式為:' . $fileInfo['extension']);
                 }
                 // 讀取解壓後的日誌文件
-                $uncompressedLogs = Storage::disk($this->driver)->get($uncompressedFileName);
+//                $uncompressedLogs = Storage::disk($this->driver)->get($fileInfo['filename']);
                 // 按行分割日誌
-                $logLines = array_filter(explode("\n", $uncompressedLogs));
+//                $logLines = array_filter(explode("\n", $uncompressedLogs));
+
+                print '解析每一行日誌條目';
+                print PHP_EOL;
                 // 解析每一行日誌條目
                 $download = $this->updateDownLoad($download, ["type" => "parse"]);
-                foreach ($logLines as $logLine) {
+                print '迴圈開始';
+                print PHP_EOL;
+                $count = 1;
+                $logs = [];
+                foreach (File::lines(Storage::disk($this->driver)->path($fileInfo['filename'])) as $line ){
                     try {
-                        $log = $logParser->parseLogEntry($logLine, $download->service_type);
+                        $log = $logParser->parseLogEntry($line, $download->service_type);
                         array_push($logs, $log);
                     } catch (\Exception $exception) {
-                        Log::error($download->service_type." download->service_type ".$logLine);
+                        Log::error($download->service_type." download->service_type ".$line);
+                    }
+                    $count++;
+                    if($count > 1000){
+                        print '寫入influx db';
+                        print PHP_EOL;
+                        $influxDBService->insertLogs($logs);
+                        $logs = [];
                     }
                 }
                 // 批量插入數據庫或其他操作
-                if (!empty($logs)) {
+//                if (!empty($logs)) {
 //                    Log::info('message:解析日誌成功:', $logs);
-                    $log_lists = array_chunk($logs, 5000);
-                    $download = $this->updateDownLoad($download, ["type" => "write"]);
-                    foreach ($log_lists as $log_data){
-                        $influxDBService->insertLogs($log_data);
-                    }
+//                    $log_lists = array_chunk($logs, 5000);
+//                    $download = $this->updateDownLoad($download, ["type" => "write"]);
+//                    foreach ($log_lists as $log_data){
+//                        $influxDBService->insertLogs($log_data);
+//                    }
                     $download = $this->updateDownLoad($download, ["type" => "done", "status" => "success"]);
 
                     # 檢查執行的 execute_schedule_id 是否為最後一筆
@@ -230,8 +245,8 @@ class CdnNetworkService
                     }
                 }
                 // 刪除解壓後的文件
-                Storage::disk($this->driver)->delete($uncompressedFileName);
-            }
+                Storage::disk($this->driver)->delete($fileInfo['filename']);
+//            }
         } catch (LogProcessException $e) {
             Log::error($e->getMessage());
         }
