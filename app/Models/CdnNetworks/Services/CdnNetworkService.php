@@ -224,6 +224,7 @@ class CdnNetworkService
                         print '寫入influx db';
                         print PHP_EOL;
                         $this->insertInfulxDB($logs);
+                        Log::driver('influxdb')->info('downloadId:'.$download->id.' count:'.$count);
                         $count = 0;
                         $logs = [];
                     }
