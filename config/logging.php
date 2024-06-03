@@ -124,6 +124,20 @@ return [
             'level' => 'info',
             'days' => 30,
         ],
+
+        'influxdb' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/influxdb.log'),
+            'level' => 'info',
+            'days' => 30,
+        ],
+
+        'log_parse' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/log_parse.log'),
+            'level' => 'info',
+            'days' => 14,
+        ],
     ],
 
 ];

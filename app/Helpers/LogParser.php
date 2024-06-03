@@ -2,6 +2,8 @@
 
 namespace App\Helpers;
 
+use Illuminate\Support\Facades\Log;
+
 class LogParser
 {
     /**
@@ -13,23 +15,25 @@ class LogParser
      */
     public function parseLogEntry($logEntry, $serviceType = null)
     {
-        switch ($serviceType) {
+        $logEntry = trim($logEntry);
+        try {
+            switch ($serviceType) {
             case '1115':
                 // %host %uident %uname [%rt] "%method %url %rp" %code %size "%referer" "%ua"
-                $pattern = '/^(?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) (?P<uident>\S+) (?P<uname>\S+) \[(?P<datetime>[^\]]+)\] "(?P<method>\S+) (?P<url>[^\s]+) HTTP\/\d\.\d" (?P<status>\d{3}) (?P<size>\d+) (?P<cache_status>\S+) (?P<backend_status>\d+) (?P<response_time>\d+) - "-" "(?P<user_agent>[^"]+)"/';
+                $pattern = '/(?P<host>\S+) (?P<uident>\S+) (?P<uname>\S+) \[(?P<rt>.+)\] "(?P<method>\S+) (?P<url>\S+) \S+" (?P<code>\d+) (?P<size>\d+) "(?P<referer>[^"]*)" "(?P<ua>.*)"/';
                 preg_match($pattern, $logEntry, $matches);
                 return [
-                    'host' => $matches[1],
-                    'uident' => $matches[2],
-                    'uname' => $matches[3],
-                    'rt' => $matches[4],
-                    'method' => $matches[5],
-                    'url' => $matches[6],
-                    'http_version' => $matches[7],
-                    'code' => $matches[8],
-                    'size' => $matches[9],
-                    'referer' => $matches[10],
-                    'ua' => $matches[11],
+                    'host' => $matches['host'],
+                    'uident' => $matches['uident'],
+                    'uname' => $matches['uname'],
+                    'rt' => $matches['rt'],
+                    'method' => $matches['method'],
+                    'url' => $matches['url'],
+                    'http_version' => $matches['http_version'],
+                    'code' => $matches['code'],
+                    'size' => $matches['size'],
+                    'referer' => $matches['referer'],
+                    'ua' => $matches['ua'],
                 ];
             case '1028':
                 // %host %uident %uname [%rt] "%method %url %rp" %code %size %cache %pic_bhs %pic_bt %tru "%referer" "%ua"
@@ -76,5 +80,9 @@ class LogParser
             default:
                 throw new \Exception('Unknown service type');
         }
+    } catch (\Exception $e) {
+        Log::driver('log_parse')->info('type:' . $serviceType . ' logEntry:' . $logEntry);
     }
+    return [];
+}
 }

@@ -75,22 +75,22 @@ class InfluxDBService
                         'measurement' => $this->measurement,
                         'fields' => Arr::only($log, [
                             'size',
-//                            'rt'
+                            'rt'
                         ]),
                         'tags' => Arr::only($log, [
                             'host',
-//                            'uident',
-//                            'uname',
+                            'uident',
+                            'uname',
                             'method',
                             'url',
-//                            'rp',
+                            'rp',
                             'code',
-//                            'referer',
+                            'referer',
                             'ua',
-//                            'cache',
-//                            'aty',
-//                            'ra',
-//                            'Content-Type'
+                            'cache',
+                            'aty',
+                            'ra',
+                            'Content-Type'
                         ]),
                         'timestamp' => isset($log['rt']) ? $this->convertToNanoseconds($log['rt']) : time() * 1000000000,
                     ]

@@ -220,6 +220,7 @@ class CdnNetworkService
                     if($count > 1000){
                         print '寫入influx db';
                         print PHP_EOL;
+                        Log::driver('influxdb')->info('downloadId:'.$download->id.' count:'.$count);
                         $influxDBService->insertLogs($logs);
                         $count = 0;
                         $logs = [];
