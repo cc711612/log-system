@@ -37,6 +37,8 @@ class CdnNetworkService
      */
     public $token;
 
+    private $influxDBService;
+
     public function setAccount(string $account)
     {
         $this->account = $account;
@@ -161,7 +163,7 @@ class CdnNetworkService
         /**
          * @var InfluxDBService
          */
-        $influxDBService = new InfluxDBService($download->users->influx_db_connection, $download->users->influx_db_token, $download->users->influx_db_org, $download->users->influx_db_bucket);
+        $this->influxDBService = new InfluxDBService($download->users->influx_db_connection, $download->users->influx_db_token, $download->users->influx_db_org, $download->users->influx_db_bucket);
         try {
             $downloadLink = $download->url;
             $parsedUrl = parse_url($downloadLink);
@@ -170,7 +172,7 @@ class CdnNetworkService
             // 從路徑中提取文件名
             $fileName = basename($path);
             $download = $this->updateDownLoad($download, ["type" => "download"]);
-            $response = Http::withHeaders(['Accept-Encoding' => 'gzip,deflate'])->get($downloadLink);
+            $response = Http::retry(5, 1000)->withHeaders(['Accept-Encoding' => 'gzip,deflate'])->get($downloadLink);
             if ($response->successful()) {
                 // 將日誌內容存儲到本地文件
                 Storage::disk($this->driver)->put($fileName, $response->body());
@@ -209,22 +211,28 @@ class CdnNetworkService
                     }
                     try {
                         $log = $logParser->parseLogEntry($line, $download->service_type);
-                        $log = $influxDBService->handleLogFormat($log);
-
-                        array_push($logs, $log);
-                    } catch (\Exception $exception) {
-                        Log::error($download->service_type." download->service_type ".$line);
-                        Log::error($exception->getMessage());
+                    } catch (\Exception $exception){
+//                        Log::error($download->service_type." download->service_type ".$line);
+                        continue;
                     }
+
+                    $log = $this->influxDBService->handleLogFormat($log);
+                    array_push($logs, $log);
+
                     $count++;
                     if($count > 1000){
                         print '寫入influx db';
                         print PHP_EOL;
-                        $influxDBService->insertLogs($logs);
+                        $this->insertInfulxDB($logs);
                         $count = 0;
                         $logs = [];
                     }
                 }
+
+                if (empty($logs) == false){
+                    $this->insertInfulxDB($logs);
+                }
+
                 // 批量插入數據庫或其他操作
 //                if (!empty($logs)) {
 //                    Log::info('message:解析日誌成功:', $logs);
@@ -297,5 +305,27 @@ class CdnNetworkService
         $downloadEntity->save();
 
         return $downloadEntity;
+    }
+
+    /**
+     * @param     $logs
+     * @param int $count
+     *
+     * @return bool
+     * @Author  : steatng
+     * @DateTime: 2024/6/2 下午10:02
+     */
+    private function insertInfulxDB($logs, $count = 0){
+        try {
+            $this->influxDBService->insertLogs($logs);
+            return true;
+        } catch (\Exception $exception){
+            if($count == 3){
+                return false;
+            }
+            $count++;
+            Log::info(sprintf("第%s次新增失敗", $count));
+            return $this->insertInfulxDB($logs);
+        }
     }
 }
