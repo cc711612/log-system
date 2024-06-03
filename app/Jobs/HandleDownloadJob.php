@@ -17,7 +17,7 @@ class HandleDownloadJob implements ShouldQueue
 
     protected $download_id;
 
-    public $timeout = 300;
+    public $timeout = 1200;
 
     /**
      * HandleDownloadJob constructor.
