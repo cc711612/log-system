@@ -132,7 +132,14 @@ class HandleExecuteScheduleCommand extends Command
                                 ];
                             $DownloadEntity =
                                 app(DownloadEntity::class)
-                                    ->create($insertData);
+                                    ->firstOrCreate([
+                                        'user_id' => $executeScheduleEntity->user_id,
+                                        'domain_name' => $DomainLogData['domainName'],
+                                        'log_time_start' => $this->handleDateTimeFormat(Arr::get($DownloadLinks, 'dateFrom')),
+                                        'log_time_end' => $this->handleDateTimeFormat(Arr::get($DownloadLinks, 'dateTo')),
+                                        ],
+                                        $insertData
+                                    );
 
                             HandleDownloadJob::dispatch($DownloadEntity->id);
                         }
