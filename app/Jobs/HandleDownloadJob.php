@@ -46,14 +46,17 @@ class HandleDownloadJob implements ShouldQueue
 
         $DownloadEntity =
             app(DownloadEntity::class)
+                ->where("status", "initial")
                 ->find($this->download_id);
 
-        $DownloadEntity->status = "in progress";
-        $DownloadEntity->save();
+        if (is_null($DownloadEntity) == false){
+            $DownloadEntity->status = "in progress";
+            $DownloadEntity->save();
 
-        # 取得 DownloadEntity
-        app(CdnNetworkService::class)
-            ->processLogByDownload($DownloadEntity);
+            # 取得 DownloadEntity
+            app(CdnNetworkService::class)
+                ->processLogByDownload($DownloadEntity);
+        }
     }
 
 
