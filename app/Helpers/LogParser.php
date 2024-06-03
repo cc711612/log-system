@@ -16,7 +16,7 @@ class LogParser
         switch ($serviceType) {
             case '1115':
                 // %host %uident %uname [%rt] "%method %url %rp" %code %size "%referer" "%ua"
-                $pattern = '/^(\d+\.\d+\.\d+\.\d+) ([^ ]+) ([^ ]+) \[([^\]]+)\] "(GET|POST|PUT|DELETE|OPTIONS|HEAD|PATCH) ([^ ]+) HTTP\/(\d+\.\d+)" (\d+) (\d+) "([^"]*)" "([^"]*)"/';
+                $pattern = '/^(?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) (?P<uident>\S+) (?P<uname>\S+) \[(?P<datetime>[^\]]+)\] "(?P<method>\S+) (?P<url>[^\s]+) HTTP\/\d\.\d" (?P<status>\d{3}) (?P<size>\d+) (?P<cache_status>\S+) (?P<backend_status>\d+) (?P<response_time>\d+) - "-" "(?P<user_agent>[^"]+)"/';
                 preg_match($pattern, $logEntry, $matches);
                 return [
                     'host' => $matches[1],

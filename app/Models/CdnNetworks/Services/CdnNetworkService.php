@@ -180,7 +180,7 @@ class CdnNetworkService
                 // 如果是.gz格式，則解壓縮
                 if ($fileInfo['extension'] == 'gz') {
                     $download = $this->updateDownLoad($download, ["type" => "gunzip"]);
-                    system(sprintf("gunzip %s",$zipFilePath));
+                    system(sprintf("gunzip -f %s",$zipFilePath));
 //                    $uncompressedData = gzdecode($compressedData);
 //                    $uncompressedFileName = $fileInfo['filename'];
 //                    // 存儲解壓後的文件

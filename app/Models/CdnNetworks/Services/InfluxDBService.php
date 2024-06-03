@@ -9,14 +9,22 @@ use InfluxDB2\Point;
 
 class InfluxDBService
 {
-    public $measurement = 'Service Type';
+    public string $measurement = 'Service Type';
+    private string $host;
+    private string $token;
+    private string $org;
+    private string $bucket;
 
     public function __construct(
-        private string $host,
-        private string $token,
-        private string $org,
-        private string $bucket
+        $host,
+        $token,
+        $org,
+        $bucket
     ) {
+        $this->host = $host;
+        $this->token = $token;
+        $this->org = $org;
+        $this->bucket = $bucket;
     }
 
     public function insertLogs($logs)
@@ -67,22 +75,22 @@ class InfluxDBService
                         'measurement' => $this->measurement,
                         'fields' => Arr::only($log, [
                             'size',
-                            'rt'
+//                            'rt'
                         ]),
                         'tags' => Arr::only($log, [
                             'host',
-                            'uident',
-                            'uname',
+//                            'uident',
+//                            'uname',
                             'method',
                             'url',
-                            'rp',
+//                            'rp',
                             'code',
-                            'referer',
+//                            'referer',
                             'ua',
-                            'cache',
-                            'aty',
-                            'ra',
-                            'Content-Type'
+//                            'cache',
+//                            'aty',
+//                            'ra',
+//                            'Content-Type'
                         ]),
                         'timestamp' => isset($log['rt']) ? $this->convertToNanoseconds($log['rt']) : time() * 1000000000,
                     ]
