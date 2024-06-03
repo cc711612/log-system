@@ -212,7 +212,7 @@ class CdnNetworkService
                     try {
                         $log = $logParser->parseLogEntry($line, $download->service_type);
                     } catch (\Exception $exception){
-//                        Log::error($download->service_type." download->service_type ".$line);
+                        Log::error($download->service_type." download->service_type ".$line);
                         continue;
                     }
 
@@ -220,7 +220,7 @@ class CdnNetworkService
                     array_push($logs, $log);
 
                     $count++;
-                    if($count > 1000){
+                    if($count >= 5000){
                         print '寫入influx db';
                         print PHP_EOL;
                         $this->insertInfulxDB($logs);
@@ -326,7 +326,7 @@ class CdnNetworkService
             }
             $count++;
             Log::info(sprintf("第%s次新增失敗", $count));
-            return $this->insertInfulxDB($logs);
+            return $this->insertInfulxDB($logs,$count);
         }
     }
 }

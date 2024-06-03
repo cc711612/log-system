@@ -21,20 +21,23 @@ class LogParser
             switch ($serviceType) {
                 case '1115':
                     // %host %uident %uname [%rt] "%method %url %rp" %code %size "%referer" "%ua"
-                    $pattern = '/(?P<host>\S+) (?P<uident>\S+) (?P<uname>\S+) \[(?P<rt>.+)\] "(?P<method>\S+) (?P<url>\S+) \S+" (?P<code>\d+) (?P<size>\d+) "(?P<referer>[^"]*)" "(?P<ua>.*)"/';
+                    $pattern = '/^(?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) (?P<uident>\S+) (?P<uname>\S+) \[(?P<datetime>[^\]]+)\] "(?P<method>[A-Z]+) (?P<url>[^\s]+) HTTP\/(?P<http_version>\d\.\d)" (?P<status>\d{1,3}) (?P<size>\d+)(?: (?P<cache_status>[A-Z_]+) (?P<cache_code>\d+|-) (?P<cache_size>\d+|-) -)? "(?P<referer>[^"]*)" "(?P<user_agent>[^"]+)"/';
                     preg_match($pattern, $logEntry, $matches);
                     return [
-                        'host'         => $matches['host'],
-                        'uident'       => $matches['uident'],
-                        'uname'        => $matches['uname'],
-                        'rt'           => $matches['rt'],
-                        'method'       => $matches['method'],
-                        'url'          => $matches['url'],
-                        'http_version' => $matches['http_version'],
-                        'code'         => $matches['code'],
-                        'size'         => $matches['size'],
-                        'referer'      => $matches['referer'],
-                        'ua'           => $matches['ua'],
+                        'host'              => $matches['ip'],
+                        'uident'            => $matches['uident'],
+                        'uname'             => $matches['uname'],
+                        'rt'                => $matches['datetime'],
+                        'method'            => $matches['method'],
+                        'url'               => $matches['url'],
+                        'http_version'      => $matches['http_version'],
+                        'code'              => $matches['status'],
+                        'size'              => $matches['size'],
+                        'cache_status'      => $matches['cache_status'] ?? '',
+                        'cache_status_code' => $matches['cache_status_code'] ?? '',
+                        'cache_size'        => $matches['cache_size'] ?? '',
+                        'referer'           => $matches['referer'],
+                        'ua'                => $matches['user_agent'],
                     ];
                 case '1028':
                     // %host %uident %uname [%rt] "%method %url %rp" %code %size %cache %pic_bhs %pic_bt %tru "%referer" "%ua"
@@ -83,6 +86,7 @@ class LogParser
             }
         } catch (\Exception $e) {
             Log::driver('log_parse')->info('type:' . $serviceType . ' logEntry:' . $logEntry);
+            Log::driver('log_parse')->info($e->getMessage());
         }
         return [];
     }
