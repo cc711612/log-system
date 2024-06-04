@@ -154,7 +154,7 @@ class HandleExecuteScheduleCommand extends Command
                     $this->startInfo('開始儲存 下載連結');
                 } else {
 //                    $executeScheduleEntity->update(['status' => 'failure']);
-                    $this->errorInfo('getDownloadLinkByDomains 為空');
+                    $this->errorInfo('getDownloadLinkByDomains 回傳資料為空');
                 }
                 sleep(1);
             }
