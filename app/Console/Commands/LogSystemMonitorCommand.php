@@ -36,7 +36,6 @@ class LogSystemMonitorCommand extends Command
     public function __construct()
     {
         parent::__construct();
-        $this->setting = (new SettingEntity())->find(1);
     }
 
     /**
@@ -46,6 +45,10 @@ class LogSystemMonitorCommand extends Command
      */
     public function handle()
     {
+        /**
+         * @var SettingEntity $setting
+         */
+        $this->setting = (new SettingEntity())->find(1);
         /**
          * @var UserEntity $userEntity
          */
@@ -76,7 +79,7 @@ class LogSystemMonitorCommand extends Command
             $this->info('MySQL connection OK');
         } catch (ConnectionException $e) {
             Log::error('MySQL connection failed: ' . $e->getMessage());
-            $user->notify(new LogNoticeNotification('MySQL connection failed: ' . $e->getMessage()));
+            $this->setting->notify(new LogNoticeNotification('MySQL connection failed: ' . $e->getMessage()));
         }
 
         if ($user->influx_db_connection) {
@@ -92,7 +95,7 @@ class LogSystemMonitorCommand extends Command
                 $this->info('InfluxDB connection OK');
             } else {
                 $this->info('InfluxDB connection failed');
-                $user->notify(new LogNoticeNotification('InfluxDB connection failed'));
+                $this->setting->notify(new LogNoticeNotification('InfluxDB connection failed'));
                 Log::error('userId:' . $user->id . ',InfluxDB connection failed');
             }
         }
@@ -107,7 +110,7 @@ class LogSystemMonitorCommand extends Command
     {
         $timeoutDownloadSchedules = $this->getTimeoutDownloadSchedules($user->id);
         if ($timeoutDownloadSchedules->count() > 0) {
-            $user->notify(new LogNoticeNotification('下載排程已超過 ' . $this->setting->download_task_alert_threshold_minutes . ' 分鐘未完成，請確認是否有問題'));
+            $this->setting->notify(new LogNoticeNotification('下載排程已超過 ' . $this->setting->download_task_alert_threshold_minutes . ' 分鐘未完成，請確認是否有問題'));
         }
     }
 
@@ -123,7 +126,7 @@ class LogSystemMonitorCommand extends Command
             !$lastExecuteSchedule
             || now()->diffInMinutes(Carbon::parse($lastExecuteSchedule->log_time_end)) > $this->setting->schedule_check_interval_minutes
         ) {
-            $user->notify(new LogNoticeNotification('會員執行排程已停止，請確認是否有問題'));
+            $this->setting->notify(new LogNoticeNotification('會員執行排程已停止，請確認是否有問題'));
         }
     }
 

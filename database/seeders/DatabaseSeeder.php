@@ -33,7 +33,6 @@ class DatabaseSeeder extends Seeder
             'influx_db_bucket'     => config('influxdb.bucket'),
             'influx_db_token'      => config('influxdb.token'),
             'influx_db_org'        => config('influxdb.org'),
-            'slack_webhook_url'    => env('SLACK_WEBHOOK_URL'),
         ]);
 
         app(SettingEntity::class)->create([
@@ -43,6 +42,8 @@ class DatabaseSeeder extends Seeder
             'task_completion_alert_threshold_minutes' => 15,
             'download_task_alert_threshold_minutes'   => 30,
             'domain_list_chuck'                       => 500,
+            'slack_webhook_url'                       => env('SLACK_WEBHOOK_URL'),
+            'email'                                   => 'cc711612@gmail.com'
         ]);
 
         app(ExecuteScheduleEntity::class)->create(

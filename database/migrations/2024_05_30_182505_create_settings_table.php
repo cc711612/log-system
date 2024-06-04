@@ -20,6 +20,8 @@ return new class extends Migration
             $table->unsignedSmallInteger('task_completion_alert_threshold_minutes')->comment('執行排程執行任務的上限時間'); // 項目名稱，必須
             $table->unsignedSmallInteger('download_task_alert_threshold_minutes')->comment('下載排程執行任務的上限時間'); // 項目名稱，必須
             $table->unsignedSmallInteger('domain_list_chuck')->comment('DomainLists 的 切分數量'); // 項目名稱，必須
+            $table->string('email', 100)->nullable()->comment('Email'); // 項目名稱，必須
+            $table->text('slack_webhook_url')->nullable()->comment('Slack Webhook URL'); // 項目名稱，必須
         });
     }
 
