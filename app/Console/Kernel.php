@@ -23,7 +23,7 @@ class Kernel extends ConsoleKernel
             ->everyFiveMinutes(); // Adjust the timing as needed
 
         $schedule->command('command:handle_execute_schedule')
-            ->everyMinutes()
+            ->everyMinute()
             ->withoutOverlapping(5);
 
         if (config('logsystem.connection_monitor.enable')) {
