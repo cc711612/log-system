@@ -223,7 +223,7 @@ class CdnNetworkService
                     if($count >= 5000){
                         print '寫入influx db';
                         print PHP_EOL;
-                        $this->insertInfulxDB($logs);
+                        $this->insertInfluxDB($logs);
                         Log::driver('influxdb')->info('downloadId:'.$download->id.' count:'.$count);
                         $count = 0;
                         $logs = [];
@@ -231,7 +231,7 @@ class CdnNetworkService
                 }
 
                 if (empty($logs) == false){
-                    $this->insertInfulxDB($logs);
+                    $this->insertInfluxDB($logs);
                 }
 
                 // 批量插入數據庫或其他操作
@@ -316,7 +316,7 @@ class CdnNetworkService
      * @Author  : steatng
      * @DateTime: 2024/6/2 下午10:02
      */
-    private function insertInfulxDB($logs, $count = 0){
+    private function insertInfluxDB($logs, $count = 0){
         try {
             $this->influxDBService->insertLogs($logs);
             return true;
@@ -326,7 +326,7 @@ class CdnNetworkService
             }
             $count++;
             Log::info(sprintf("第%s次新增失敗", $count));
-            return $this->insertInfulxDB($logs,$count);
+            return $this->insertInfluxDB($logs,$count);
         }
     }
 }

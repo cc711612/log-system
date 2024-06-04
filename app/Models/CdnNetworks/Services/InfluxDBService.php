@@ -70,31 +70,31 @@ class InfluxDBService
     {
         return
             $this
-                ->handleDataPointFormat(
-                    [
-                        'measurement' => $this->measurement,
-                        'fields' => Arr::only($log, [
-                            'size',
-                            'rt'
-                        ]),
-                        'tags' => Arr::only($log, [
-                            'host',
-                            'uident',
-                            'uname',
-                            'method',
-                            'url',
-                            'rp',
-                            'code',
-                            'referer',
-                            'ua',
-                            'cache',
-                            'aty',
-                            'ra',
-                            'Content-Type'
-                        ]),
-                        'timestamp' => isset($log['rt']) ? $this->convertToNanoseconds($log['rt']) : time() * 1000000000,
-                    ]
-                );
+            ->handleDataPointFormat(
+                [
+                    'measurement' => $this->measurement,
+                    'fields' => Arr::only($log, [
+                        'size',
+                        'rt'
+                    ]),
+                    'tags' => Arr::only($log, [
+                        'host',
+                        'uident',
+                        'uname',
+                        'method',
+                        'url',
+                        'rp',
+                        'code',
+                        'referer',
+                        'ua',
+                        'cache',
+                        'aty',
+                        'ra',
+                        'Content-Type'
+                    ]),
+                    'timestamp' => isset($log['rt']) ? $this->convertToNanoseconds($log['rt']) : time() * 1000000000,
+                ]
+            );
     }
 
     public function handleDataPointFormat($data)
@@ -107,7 +107,6 @@ class InfluxDBService
         /**
          * @var Point
          */
-        return new Point($measurement, $fields, $tags, $timestamp);
+        return new Point($measurement, $tags, $fields, $timestamp);
     }
-
 }
