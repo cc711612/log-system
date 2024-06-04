@@ -107,7 +107,7 @@ class InfluxDBService
         /**
          * @var Point
          */
-        return new Point($measurement, $fields, $tags, $timestamp);
+        return new Point($measurement, $tags ,$fields, $timestamp);
     }
 
 }
