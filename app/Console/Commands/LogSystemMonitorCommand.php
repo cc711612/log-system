@@ -31,7 +31,7 @@ class LogSystemMonitorCommand extends Command
      */
     protected $description = '監測系統 log 並新增執行排程';
 
-    protected SettingEntity $setting;
+    protected $setting;
 
     public function __construct()
     {
