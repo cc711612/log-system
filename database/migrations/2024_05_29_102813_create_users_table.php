@@ -28,7 +28,6 @@ return new class extends Migration
             $table->string('influx_db_bucket', 255)->nullable()->comment('InfluxDB Bucket Name');
             $table->string('influx_db_token', 255)->nullable()->comment('InfluxDB Token');
             $table->string('influx_db_org', 255)->nullable()->comment('InfluxDB Org');
-            $table->text('slack_webhook_url')->nullable()->comment('Slack Webhook URL');
             $table->timestamps(); // Laravel auto adds created_at and updated_at columns
             $table->softDeletes()->comment('Deleted At');
         });
