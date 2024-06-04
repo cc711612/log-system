@@ -107,8 +107,11 @@ class InfluxDB
      */
     public function isServiceRunning(): bool
     {
-        $response = $this->client->ping();
-
-        return isset($response['X-Influxdb-Version']) && isset($response['X-Influxdb-Build']);
+        try {
+            $response = $this->client->ping();
+            return isset($response['X-Influxdb-Version']) && isset($response['X-Influxdb-Build']);
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }
