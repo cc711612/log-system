@@ -33,7 +33,6 @@ class DatabaseSeeder extends Seeder
             'influx_db_bucket'     => config('influxdb.bucket'),
             'influx_db_token'      => config('influxdb.token'),
             'influx_db_org'        => config('influxdb.org'),
-            'slack_webhook_url'    => env('SLACK_WEBHOOK_URL'),
         ]);
 
         app(SettingEntity::class)->create([

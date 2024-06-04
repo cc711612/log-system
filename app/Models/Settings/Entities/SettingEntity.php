@@ -19,5 +19,7 @@ class SettingEntity extends Model
         'task_completion_alert_threshold_minutes',
         'download_task_alert_threshold_minutes',
         'domain_list_chuck',
+        'slack_webhook_url',
+        'email',
     ];
 }
