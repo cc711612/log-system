@@ -35,8 +35,7 @@ class LogSystemMonitorCommand extends Command
 
     public function __construct()
     {
-        parent::__construct();
-        $this->setting = (new SettingEntity())->find(1);
+        parent::__construct();   
     }
 
     /**
@@ -46,6 +45,7 @@ class LogSystemMonitorCommand extends Command
      */
     public function handle()
     {
+        $this->setting = (new SettingEntity())->find(1);
         /**
          * @var UserEntity $userEntity
          */
