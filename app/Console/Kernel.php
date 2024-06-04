@@ -14,11 +14,11 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-         $schedule->command('command:create-execute-schedule')
+         $schedule->command('command:create_execute_schedule')
              ->everyFiveMinutes() // Adjust the timing as needed
              ->then(function () use ($schedule) {
                  // Schedule the second command to run after the first one completes
-                 $schedule->command('command:handle-execute-schedule')
+                 $schedule->command('command:handle_execute_schedule')
                      ->withoutOverlapping();
              });
     }
