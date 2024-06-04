@@ -7,4 +7,4 @@
 0       5       1       *       *       run-parts /etc/periodic/monthly
 
 # 觸發 laravel 排程機制
-* * * * * /usr/local/bin/php /var/www/html/artisan schedule:run >> /dev/null
+#* * * * * /usr/local/bin/php /var/www/html/artisan schedule:run >> /dev/null

@@ -24,6 +24,8 @@ return new class extends Migration
             $table->timestamp('created_at')->useCurrent()->comment('Created At'); // 創建時間，必須，默認當前時間
             $table->timestamp('updated_at')->useCurrent()->comment('Updated At'); // 更新時間，必須，默認當前時間
             $table->softDeletes()->comment('Deleted At'); // 軟刪除時間
+
+            $table->index(['user_id','log_time_start','log_time_end','status'])->comment('驗證碼索引');
         });
     }
 

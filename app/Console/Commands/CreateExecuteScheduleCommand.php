@@ -49,15 +49,25 @@ class CreateExecuteScheduleCommand extends Command
 
         $userEntities->each(function (UserEntity $userEntity) use ($timeRange) {
             app(ExecuteScheduleEntity::class)
-                ->create([
-                    'user_id' => $userEntity->id,
-                    'log_time_start' => Arr::get($timeRange, 'start_at'),
-                    'log_time_end' => Arr::get($timeRange, 'end_at'),
-                    'status' => 'initial',
-                    'process_time_start' => null,
-                    'process_time_end' => null,
-                ]);
+                ->firstOrCreate(
+                    [
+                        'user_id'            => $userEntity->id,
+                        'log_time_start'     => Arr::get($timeRange, 'start_at'),
+                        'log_time_end'       => Arr::get($timeRange, 'end_at'),
+                        'status'             => 'initial',
+                    ],
+                    [
+                        'user_id'            => $userEntity->id,
+                        'log_time_start'     => Arr::get($timeRange, 'start_at'),
+                        'log_time_end'       => Arr::get($timeRange, 'end_at'),
+                        'status'             => 'initial',
+                        'process_time_start' => null,
+                        'process_time_end'   => null,
+                    ]
+                );
         });
+
+//        $this->call('command:handle_execute_schedule');
     }
 
     private function handleStartEnd($range)
@@ -71,7 +81,7 @@ class CreateExecuteScheduleCommand extends Command
 
         return [
             'start_at' => $roundedTime->format('Y-m-d H:i:00'),
-            'end_at' => $roundedTime->addMinutes($range)->format('Y-m-d H:i:00'),
+            'end_at'   => $roundedTime->addMinutes($range)->format('Y-m-d H:i:00'),
         ];
     }
 }
