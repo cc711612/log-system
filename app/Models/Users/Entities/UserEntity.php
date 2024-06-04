@@ -7,11 +7,10 @@ use App\Models\ExecuteSchedules\Entities\ExecuteScheduleEntity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Notifications\Notifiable;
 
 class UserEntity extends Model
 {
-    use HasFactory, SoftDeletes, Notifiable;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'users';
 
@@ -48,15 +47,5 @@ class UserEntity extends Model
     public function executeSchedules()
     {
         return $this->hasMany(ExecuteScheduleEntity::class, 'user_id', 'id');
-    }
-
-    public function routeNotificationForSlack($notification)
-    {
-        return $this->slack_webhook_url;
-    }
-
-    public function routeNotificationForMail($notification)
-    {
-        return $this->email;
     }
 }

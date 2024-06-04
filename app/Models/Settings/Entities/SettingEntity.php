@@ -4,10 +4,11 @@ namespace App\Models\Settings\Entities;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
 
 class SettingEntity extends Model
 {
-    use HasFactory;
+    use HasFactory, Notifiable;
 
     public $timestamps = false;
 
@@ -22,4 +23,14 @@ class SettingEntity extends Model
         'slack_webhook_url',
         'email',
     ];
+
+    public function routeNotificationForSlack($notification)
+    {
+        return $this->slack_webhook_url;
+    }
+
+    public function routeNotificationForMail($notification)
+    {
+        return $this->email;
+    }
 }
