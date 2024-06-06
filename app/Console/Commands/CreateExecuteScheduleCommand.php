@@ -46,7 +46,7 @@ class CreateExecuteScheduleCommand extends Command
         // 取得執行區間
         $minute_range = Arr::get($this->setting, 'delay_minutes', 5);
         $timeRange = $this->handleStartEnd($minute_range);
-dd($timeRange);
+
         $userEntities->each(function (UserEntity $userEntity) use ($timeRange) {
             app(ExecuteScheduleEntity::class)
                 ->firstOrCreate(
