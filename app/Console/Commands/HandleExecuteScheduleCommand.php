@@ -71,6 +71,8 @@ class HandleExecuteScheduleCommand extends Command
                 Arr::get($userEntity, 'tswd_token'),
                 Arr::get($setting, 'domain_list_chuck', 500)
             );
+            $executeScheduleEntity->status = 'queue';
+            $executeScheduleEntity->save();
         });
 
         $this->endInfo(self::class);
