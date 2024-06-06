@@ -144,7 +144,9 @@ class LogSystemMonitorCommand extends Command
         $executeScheduleEntity = app(ExecuteScheduleEntity::class);
         return $executeScheduleEntity
             ->where('user_id', $userId)
-            ->orderBy('log_time_end', 'desc')
+            ->orderBy('id')
+            ->whereNotNull('process_time_start')
+            ->whereNull('process_time_end')
             ->first();
     }
 
@@ -164,7 +166,7 @@ class LogSystemMonitorCommand extends Command
         return $downloadEntity
             ->where('user_id', $userId)
             ->where('status', 'in progress')
-            ->where('created_at', '<', now()->subMinutes($this->setting->download_task_alert_threshold_minutes))
+            ->where('updated_at', '<', now()->subMinutes($this->setting->download_task_alert_threshold_minutes))
             ->get();
     }
 }
