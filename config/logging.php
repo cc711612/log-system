@@ -125,6 +125,13 @@ return [
             'days' => 30,
         ],
 
+        'execute_schedule' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/execute_schedule.log'),
+            'level' => 'info',
+            'days' => 30,
+        ],
+
         'influxdb' => [
             'driver' => 'daily',
             'path' => storage_path('logs/influxdb.log'),
