@@ -54,7 +54,7 @@ class CreateExecuteScheduleCommand extends Command
                         'user_id'            => $userEntity->id,
                         'log_time_start'     => Arr::get($timeRange, 'start_at'),
                         'log_time_end'       => Arr::get($timeRange, 'end_at'),
-                        'status'             => 'initial',
+//                        'status'             => 'initial',
                     ],
                     [
                         'user_id'            => $userEntity->id,
