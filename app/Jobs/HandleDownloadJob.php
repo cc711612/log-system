@@ -5,7 +5,6 @@ namespace App\Jobs;
 use App\Models\CdnNetworks\Services\CdnNetworkService;
 use App\Models\Downloads\Entities\DownloadEntity;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;

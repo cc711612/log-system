@@ -109,7 +109,7 @@ class HandleExecuteScheduleJob implements ShouldQueue
                                 'control_group_name' => !empty($controlGroupByDomain[$DomainLogData['domainName']]) ? $controlGroupByDomain[$DomainLogData['domainName']]['controlGroupName'] : null,
                                 'control_group_code' => !empty($controlGroupByDomain[$DomainLogData['domainName']]) ? $controlGroupByDomain[$DomainLogData['domainName']]['controlGroupCode'] : null,
                                 'log_time_start' => $this->handleDateTimeFormat(Arr::get($DownloadLinks, 'dateFrom')),
-                                'log_time_end' => $this->handleDateTimeFormat(Arr::get($DownloadLinks, 'dateTo')),
+                                'log_time_end' => $this->handleDateTimeFormat(Arr::get($DownloadLinks, 'dateTo'), 59),
                                 'type' => 'initial',
                                 'status' => 'initial',
                             ];
@@ -243,13 +243,14 @@ class HandleExecuteScheduleJob implements ShouldQueue
     }
 
     /**
-     * @param $dateString
+     * @param     $dateString
+     * @param int $second
      *
      * @return string
      * @Author  : steatng
-     * @DateTime: 2024/6/6 下午2:23
+     * @DateTime: 2024/6/7 下午4:19
      */
-    private function handleDateTimeFormat($dateString)
+    private function handleDateTimeFormat($dateString, $second = 0)
     {
         // 解析原始字串
         $year = substr($dateString, 0, 4);
@@ -259,7 +260,7 @@ class HandleExecuteScheduleJob implements ShouldQueue
         $minute = substr($dateString, 13, 2);
 
         // 創建 Carbon 實例
-        $date = Carbon::create($year, $month, $day, $hour, $minute, 0);
+        $date = Carbon::create($year, $month, $day, $hour, $minute, $second);
 
         // 返回格式化的字串
         return $date->format('Y-m-d H:i:s');

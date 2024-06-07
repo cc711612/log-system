@@ -30,6 +30,8 @@ class CdnNetworkService
      */
     public $account;
 
+    public $status = true;
+
     /**
      * token
      *
@@ -183,86 +185,72 @@ class CdnNetworkService
                 if ($fileInfo['extension'] == 'gz') {
                     $download = $this->updateDownLoad($download, ["type" => "gunzip"]);
                     system(sprintf("gunzip -f %s",$zipFilePath));
-//                    $uncompressedData = gzdecode($compressedData);
-//                    $uncompressedFileName = $fileInfo['filename'];
-//                    // 存儲解壓後的文件
-//                    Storage::disk($this->driver)->put($uncompressedFileName, $uncompressedData);
-//                    // 刪除壓縮文件
-//                    Storage::disk($this->driver)->delete($fileName);
                 } else {
-                    throw new LogFileExtensionException('檔案格式錯誤，只支持.gz格式的日誌文件，檔案格式為:' . $fileInfo['extension']);
+                    $this->status = false;
+                    Log::channel('download')->error('檔案格式錯誤，只支持.gz格式的日誌文件，檔案格式為:'. $fileInfo['extension']);
                 }
-                // 讀取解壓後的日誌文件
-//                $uncompressedLogs = Storage::disk($this->driver)->get($fileInfo['filename']);
-                // 按行分割日誌
-//                $logLines = array_filter(explode("\n", $uncompressedLogs));
 
-                print '解析每一行日誌條目';
-                print PHP_EOL;
-                // 解析每一行日誌條目
-                $download = $this->updateDownLoad($download, ["type" => "parse"]);
-                print '迴圈開始';
-                print PHP_EOL;
-                $count = 0;
-                $logs = [];
-                foreach (File::lines(Storage::disk($this->driver)->path($fileInfo['filename'])) as $line ){
-                    if($line == "") {
-                        break;
+                if ($this->status == true){
+                    // 解析每一行日誌條目
+                    $download = $this->updateDownLoad($download, ["type" => "parse"]);
+
+                    $count = 0;
+                    $logs = [];
+                    foreach (File::lines(Storage::disk($this->driver)->path($fileInfo['filename'])) as $line ){
+                        if($line == "") {
+                            break;
+                        }
+                        try {
+                            $log = $logParser->parseLogEntry($line, $download->service_type);
+                        } catch (\Exception $exception){
+                            $this->status = false;
+                            Log::error($download->service_type." download->service_type ".$line);
+                            continue;
+                        }
+
+                        $log = $this->influxDBService->handleLogFormat($log);
+                        array_push($logs, $log);
+
+                        $count++;
+                        if($count >= 1000){
+                            $this->insertInfluxDB($logs);
+                            Log::driver('influxdb')->info('downloadId:'.$download->id.' count:'.$count);
+                            $count = 0;
+                            $logs = [];
+                        }
                     }
-                    try {
-                        $log = $logParser->parseLogEntry($line, $download->service_type);
-                    } catch (\Exception $exception){
-                        Log::error($download->service_type." download->service_type ".$line);
-                        continue;
-                    }
 
-                    $log = $this->influxDBService->handleLogFormat($log);
-                    array_push($logs, $log);
-
-                    $count++;
-                    if($count >= 5000){
-                        print '寫入influx db';
-                        print PHP_EOL;
+                    if (empty($logs) == false){
                         $this->insertInfluxDB($logs);
-                        Log::driver('influxdb')->info('downloadId:'.$download->id.' count:'.$count);
-                        $count = 0;
-                        $logs = [];
                     }
                 }
 
-                if (empty($logs) == false){
-                    $this->insertInfluxDB($logs);
-                }
-
-                // 批量插入數據庫或其他操作
-//                if (!empty($logs)) {
-//                    Log::info('message:解析日誌成功:', $logs);
-//                    $log_lists = array_chunk($logs, 5000);
-//                    $download = $this->updateDownLoad($download, ["type" => "write"]);
-//                    foreach ($log_lists as $log_data){
-//                        $influxDBService->insertLogs($log_data);
-//                    }
+                if($this->status == true){
                     $download = $this->updateDownLoad($download, ["type" => "done", "status" => "success"]);
-
-                    # 檢查執行的 execute_schedule_id 是否為最後一筆
-                    $execute_schedule_count =
-                        app(DownloadEntity::class)
-                            ->where("execute_schedule_id", $download->execute_schedule_id)
-                            ->where("type", "!=", "done")
-                            ->count();
-
-                    if($execute_schedule_count == 0){
-                        app(ExecuteScheduleEntity::class)
-                            ->find($download->execute_schedule_id)
-                            ->update([
-                                'status' => "success",
-                                'process_time_end' => now()->toDateTimeString()
-                            ]);
-                    }
+                } else {
+                    $this->updateDownLoad($download, ["status" => "failure"]);
                 }
-                // 刪除解壓後的文件
-                Storage::disk($this->driver)->delete($fileInfo['filename']);
-//            }
+
+                # 檢查執行的 execute_schedule_id 是否為最後一筆
+                $DownloadStatusEntities =
+                    app(DownloadEntity::class)
+                        ->selectRaw("DISTINCT status")
+                        ->where("execute_schedule_id", $download->execute_schedule_id)
+                        ->get()
+                        ->pluck("status")
+                ;
+
+                if($DownloadStatusEntities->contains("in process") == false){
+                    app(ExecuteScheduleEntity::class)
+                        ->find($download->execute_schedule_id)
+                        ->update([
+                            'status' => ($DownloadStatusEntities->contains("failure") == false) ? "success" : "failure",
+                            'process_time_end' => now()->toDateTimeString()
+                        ]);
+                }
+            }
+            // 刪除解壓後的文件
+            Storage::disk($this->driver)->delete($fileInfo['filename']);
         } catch (LogProcessException $e) {
             Log::error($e->getMessage());
         }
@@ -322,10 +310,12 @@ class CdnNetworkService
             return true;
         } catch (\Exception $exception){
             if($count == 3){
+                $this->status = false;
                 return false;
             }
             $count++;
-            Log::info(sprintf("第%s次新增失敗", $count));
+            Log::channel('influxdb')->info(sprintf("第%s次新增失敗", $count));
+            Log::channel('influxdb')->error($exception->getMessage());
             return $this->insertInfluxDB($logs,$count);
         }
     }
