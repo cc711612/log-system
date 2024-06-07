@@ -7,4 +7,5 @@ return [
     'token' => env('INFLUXDB_TOKEN', ''),
     'bucket' => env('INFLUXDB_BUCKET', ''),
     'org' => env('INFLUXDB_ORG', 'myorg'),
+    'insertCount' => env('INFLUXDB_INSERT_COUNT', 1000),
 ];

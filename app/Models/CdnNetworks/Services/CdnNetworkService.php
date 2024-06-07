@@ -184,27 +184,27 @@ class CdnNetworkService
                 // 如果是.gz格式，則解壓縮
                 if ($fileInfo['extension'] == 'gz') {
                     $download = $this->updateDownLoad($download, ["type" => "gunzip"]);
-                    system(sprintf("gunzip -f %s",$zipFilePath));
+                    system(sprintf("gunzip -f %s", $zipFilePath));
                 } else {
                     $this->status = false;
-                    Log::channel('download')->error('檔案格式錯誤，只支持.gz格式的日誌文件，檔案格式為:'. $fileInfo['extension']);
+                    Log::channel('download')->error('檔案格式錯誤，只支持.gz格式的日誌文件，檔案格式為:' . $fileInfo['extension']);
                 }
 
-                if ($this->status == true){
+                if ($this->status == true) {
                     // 解析每一行日誌條目
                     $download = $this->updateDownLoad($download, ["type" => "parse"]);
 
                     $count = 0;
                     $logs = [];
-                    foreach (File::lines(Storage::disk($this->driver)->path($fileInfo['filename'])) as $line ){
-                        if($line == "") {
+                    foreach (File::lines(Storage::disk($this->driver)->path($fileInfo['filename'])) as $line) {
+                        if ($line == "") {
                             break;
                         }
                         try {
                             $log = $logParser->parseLogEntry($line, $download->service_type);
-                        } catch (\Exception $exception){
+                        } catch (\Exception $exception) {
                             $this->status = false;
-                            Log::error($download->service_type." download->service_type ".$line);
+                            Log::error($download->service_type . " download->service_type " . $line);
                             continue;
                         }
 
@@ -212,20 +212,20 @@ class CdnNetworkService
                         array_push($logs, $log);
 
                         $count++;
-                        if($count >= 1000){
+                        if ($count >= config('influxdb.insertCount')) {
                             $this->insertInfluxDB($logs);
-                            Log::driver('influxdb')->info('downloadId:'.$download->id.' count:'.$count);
+                            Log::driver('influxdb')->info('downloadId:' . $download->id . ' count:' . $count);
                             $count = 0;
                             $logs = [];
                         }
                     }
 
-                    if (empty($logs) == false){
+                    if (empty($logs) == false) {
                         $this->insertInfluxDB($logs);
                     }
                 }
 
-                if($this->status == true){
+                if ($this->status == true) {
                     $download = $this->updateDownLoad($download, ["type" => "done", "status" => "success"]);
                 } else {
                     $this->updateDownLoad($download, ["status" => "failure"]);
@@ -234,13 +234,12 @@ class CdnNetworkService
                 # 檢查執行的 execute_schedule_id 是否為最後一筆
                 $DownloadStatusEntities =
                     app(DownloadEntity::class)
-                        ->selectRaw("DISTINCT status")
-                        ->where("execute_schedule_id", $download->execute_schedule_id)
-                        ->get()
-                        ->pluck("status")
-                ;
+                    ->selectRaw("DISTINCT status")
+                    ->where("execute_schedule_id", $download->execute_schedule_id)
+                    ->get()
+                    ->pluck("status");
 
-                if($DownloadStatusEntities->contains("in process") == false){
+                if ($DownloadStatusEntities->contains("in process") == false) {
                     app(ExecuteScheduleEntity::class)
                         ->find($download->execute_schedule_id)
                         ->update([
@@ -284,10 +283,9 @@ class CdnNetworkService
      * @Author  : steatng
      * @DateTime: 2024/5/31 下午9:22
      */
-    private function updateDownLoad(DownloadEntity $downloadEntity, array $params) : DownloadEntity
+    private function updateDownLoad(DownloadEntity $downloadEntity, array $params): DownloadEntity
     {
-        foreach ($params as $index => $value)
-        {
+        foreach ($params as $index => $value) {
             $downloadEntity->$index = $value;
         }
 
@@ -304,19 +302,20 @@ class CdnNetworkService
      * @Author  : steatng
      * @DateTime: 2024/6/2 下午10:02
      */
-    private function insertInfluxDB($logs, $count = 0){
+    private function insertInfluxDB($logs, $count = 0)
+    {
         try {
             $this->influxDBService->insertLogs($logs);
             return true;
-        } catch (\Exception $exception){
-            if($count == 3){
+        } catch (\Exception $exception) {
+            if ($count == 3) {
                 $this->status = false;
                 return false;
             }
             $count++;
             Log::channel('influxdb')->info(sprintf("第%s次新增失敗", $count));
             Log::channel('influxdb')->error($exception->getMessage());
-            return $this->insertInfluxDB($logs,$count);
+            return $this->insertInfluxDB($logs, $count);
         }
     }
 }
