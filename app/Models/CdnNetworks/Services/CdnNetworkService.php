@@ -214,7 +214,6 @@ class CdnNetworkService
                         $count++;
                         if ($count >= config('influxdb.insertCount')) {
                             $this->insertInfluxDB($logs);
-                            Log::driver('influxdb')->info('downloadId:' . $download->id . ' count:' . $count);
                             $count = 0;
                             $logs = [];
                         }
