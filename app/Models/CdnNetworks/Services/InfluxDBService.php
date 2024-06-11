@@ -68,33 +68,40 @@ class InfluxDBService
 
     public function handleLogFormat($log)
     {
+        $tags = Arr::only($log, [
+            'host',
+            'uident',
+            'uname',
+            'method',
+            'url',
+            'rp',
+            'code',
+            'referer',
+            'ua',
+            'cache',
+            'aty',
+            'ra',
+            'Content-Type'
+        ]);
+        // 過濾特殊字元
+        $tags = array_map(function ($tag) {
+            $tag = str_replace(' ', '\ ', $tag); // 將所有的空格替換為 '\ '
+            $tag = str_replace(',', '\,', $tag); // 將所有的逗號替換為 '\,'
+            $tag = str_replace('=', '\=', $tag); // 將所有的等號替換為 '\='
+        }, $tags);
         return
             $this
-                ->handleDataPointFormat(
-                    [
-                        'measurement' => $this->measurement,
-                        'fields' => Arr::only($log, [
-                            'size',
-                            'rt'
-                        ]),
-                        'tags' => Arr::only($log, [
-                            'host',
-                            'uident',
-                            'uname',
-                            'method',
-                            'url',
-                            'rp',
-                            'code',
-                            'referer',
-                            'ua',
-                            'cache',
-                            'aty',
-                            'ra',
-                            'Content-Type'
-                        ]),
-                        'timestamp' => isset($log['rt']) ? $this->convertToNanoseconds($log['rt']) : time() * 1000000000,
-                    ]
-                );
+            ->handleDataPointFormat(
+                [
+                    'measurement' => $this->measurement,
+                    'fields' => Arr::only($log, [
+                        'size',
+                        'rt'
+                    ]),
+                    'tags' => $tags,
+                    'timestamp' => isset($log['rt']) ? $this->convertToNanoseconds($log['rt']) : time() * 1000000000,
+                ]
+            );
     }
 
     public function handleDataPointFormat($data)
