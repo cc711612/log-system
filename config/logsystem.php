@@ -6,4 +6,5 @@ return [
     'connection_monitor' => [
         'enable' => env('LOG_SYSTEM_CONNECTION_MONITOR_ENABLE', false),
     ],
+    'delay' => env('LOG_SYSTEM_DELAY', 5),
 ];

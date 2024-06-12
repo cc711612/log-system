@@ -37,7 +37,7 @@ class CreateExecuteScheduleCommand extends Command
         // 取得 user
         $userEntities =
             app(UserEntity::class)
-                ->get();
+            ->get();
 
         // 取得設定
         $this->setting = app(SettingEntity::class)
@@ -54,7 +54,7 @@ class CreateExecuteScheduleCommand extends Command
                         'user_id'            => $userEntity->id,
                         'log_time_start'     => Arr::get($timeRange, 'start_at'),
                         'log_time_end'       => Arr::get($timeRange, 'end_at'),
-//                        'status'             => 'initial',
+                        //                        'status'             => 'initial',
                     ],
                     [
                         'user_id'            => $userEntity->id,
@@ -67,12 +67,12 @@ class CreateExecuteScheduleCommand extends Command
                 );
         });
 
-//        $this->call('command:handle_execute_schedule');
+        //        $this->call('command:handle_execute_schedule');
     }
 
     private function handleStartEnd($range)
     {
-        $roundedTime = Carbon::now()->subMinutes($range);
+        $roundedTime = Carbon::now()->subMinutes(config('logsystem.delay'));
 
         // 取整到每個五分鐘的整點
         $minute = floor($roundedTime->minute / $range) * $range;
