@@ -67,7 +67,17 @@ class InfluxDBService
     }
 
     public function handleLogFormat($log)
-    {
+    { // 轉義特殊字符
+        // $escapeCharacters = function ($value) {
+        //     $replacements = [
+        //         " " => "\ ",
+        //         "," => "\,",
+        //         "=" => "\=",
+        //         "\"" => "\\\"",
+        //     ];
+        //     return str_replace(array_keys($replacements), array_values($replacements), $value);
+        // };
+
         $tags = Arr::only($log, [
             'host',
             'uident',
@@ -83,13 +93,12 @@ class InfluxDBService
             'ra',
             'Content-Type'
         ]);
-        // 過濾特殊字元
-        $tags = array_map(function ($tag) {
-            $tag = str_replace(' ', '\ ', $tag); // 將所有的空格替換為 '\ '
-            $tag = str_replace(',', '\,', $tag); // 將所有的逗號替換為 '\,'
-            $tag = str_replace('=', '\=', $tag); // 將所有的等號替換為 '\='
-            return $tag;
-        }, $tags);
+
+        // 拔除後方的反斜線
+        if (!empty($tags['referer'])) {
+            $tags['referer'] = rtrim($tags['referer'], "\\");
+        }
+        
         return
             $this
             ->handleDataPointFormat(
