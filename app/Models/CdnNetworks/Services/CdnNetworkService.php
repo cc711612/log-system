@@ -173,7 +173,7 @@ class CdnNetworkService
             $path = $parsedUrl['path'];
             // 從路徑中提取文件名
             $fileName = basename($path);
-            $download = $this->updateDownLoad($download, ["type" => "download"]);
+            $download = $this->updateDownLoad($download, ['pid' => getmypid(), "type" => "download"]);
             $response = Http::retry(5, 1000)->withHeaders(['Accept-Encoding' => 'gzip,deflate'])->get($downloadLink);
             if ($response->successful()) {
                 // 將日誌內容存儲到本地文件
@@ -311,10 +311,10 @@ class CdnNetworkService
                 $this->status = false;
                 return false;
             }
-            sleep(60);
             $count++;
-            Log::channel('influxdb')->info(sprintf("第%s次新增失敗", $count));
+            Log::channel('influxdb')->info(sprintf("pid:%s , 第%s次新增失敗", getmypid(), $count));
             Log::channel('influxdb')->error($exception->getMessage());
+            sleep(60);
             return $this->insertInfluxDB($logs, $count);
         }
     }

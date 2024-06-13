@@ -25,9 +25,9 @@ class LogParser
                         '/^(?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) (?P<uident>\S+) (?P<uname>\S+) \[(?P<datetime>[^\]]+)\] "(?P<method>[A-Z]+) (?P<url>[^\s]+) HTTP\/(?P<http_version>\d\.\d)" (?P<status>\d{1,3}) (?P<size>\d+) (?P<cache_status>[A-Z_]+)\s+(?P<cache_code>\d+|-)\s+(?P<cache_size>\d+|-)\s+(?P<response_bytes>\d+|-)\s+"(?P<referer>[^"]*)" "(?P<user_agent>.+)"$/'
                     ];
 
-                    foreach ($patterns as $pattern){
+                    foreach ($patterns as $pattern) {
                         preg_match($pattern, $logEntry, $matches);
-                        if(empty($matches) == true){
+                        if (empty($matches) == true) {
                             continue;
                         }
                         return [
@@ -100,7 +100,7 @@ class LogParser
 
             throw new \Exception('match error');
         } catch (\Exception $e) {
-            Log::driver('log_parse')->info('type:' . $serviceType . ' logEntry:' . $logEntry);
+            Log::driver('log_parse')->info('pid:' . getmypid() . 'type:' . $serviceType . ' logEntry:' . $logEntry);
             Log::driver('log_parse')->info($e->getMessage());
         }
         return [];
