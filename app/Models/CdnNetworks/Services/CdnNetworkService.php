@@ -202,6 +202,9 @@ class CdnNetworkService
                         }
                         try {
                             $log = $logParser->parseLogEntry($line, $download->service_type);
+                            $log['measurement'] = $download->service_type;
+                            $log['hostname'] = $download->domain_name;
+                            $log['servicegroup'] = $download->control_group_name;
                         } catch (\Exception $exception) {
                             $this->status = false;
                             Log::error($download->service_type . " download->service_type " . $line);

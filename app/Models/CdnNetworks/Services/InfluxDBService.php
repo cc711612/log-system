@@ -9,7 +9,6 @@ use InfluxDB2\Point;
 
 class InfluxDBService
 {
-    public string $measurement = 'Service Type';
     private string $host;
     private string $token;
     private string $org;
@@ -79,37 +78,41 @@ class InfluxDBService
         // };
 
         $tags = Arr::only($log, [
-            'host',
-            'uident',
-            'uname',
-            'method',
-            'url',
-            'rp',
-            'code',
-            'referer',
-            'ua',
-            'cache',
-            'aty',
-            'ra',
-            'Content-Type'
+            "hostname",
+            "servicegroup",
+            "clientIP",
+            "uident",
+            "uname",
+            "method",
+            "url",
+            "version",
+            "code",
+            "referer",
+            "useragent",
+            "cache",
+            "origincode",
+            "attack-type",
+            "firewall-action",
+            "content-type"
         ]);
 
         // 拔除後方的反斜線
         if (!empty($tags['referer'])) {
             $tags['referer'] = rtrim($tags['referer'], "\\");
         }
-        
+
         return
             $this
             ->handleDataPointFormat(
                 [
-                    'measurement' => $this->measurement,
+                    'measurement' => Arr::get($log, 'measurement'),
                     'fields' => Arr::only($log, [
                         'size',
-                        'rt'
+                        'origin-responsetime',
+                        'origin-turnaroundtime'
                     ]),
                     'tags' => $tags,
-                    'timestamp' => isset($log['rt']) ? $this->convertToNanoseconds($log['rt']) : time() * 1000000000,
+                    'timestamp' => isset($log['timestamp']) ? $this->convertToNanoseconds($log['timestamp']) : time() * 1000000000,
                 ]
             );
     }
