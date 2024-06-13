@@ -311,6 +311,7 @@ class CdnNetworkService
                 $this->status = false;
                 return false;
             }
+            sleep(60);
             $count++;
             Log::channel('influxdb')->info(sprintf("第%s次新增失敗", $count));
             Log::channel('influxdb')->error($exception->getMessage());
