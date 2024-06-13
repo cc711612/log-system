@@ -72,10 +72,10 @@ class CreateExecuteScheduleCommand extends Command
 
     private function handleStartEnd($range)
     {
-        $roundedTime = Carbon::now()->subMinutes(config('logsystem.delay'));
+        $roundedTime = Carbon::now()->subMinutes($range);
 
-        // 取整到每個五分鐘的整點
-        $minute = floor($roundedTime->minute / $range) * $range;
+        // 取整到每個5分鐘的整點
+        $minute = floor($roundedTime->minute / 5) * 5;
         $roundedTime->setMinute($minute);
         $roundedTime->setSecond(0);
 
