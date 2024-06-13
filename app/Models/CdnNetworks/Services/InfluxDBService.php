@@ -78,22 +78,22 @@ class InfluxDBService
         // };
 
         $tags = Arr::only($log, [
-            "hostname",
-            "servicegroup",
-            "clientIP",
-            "uident",
-            "uname",
-            "method",
-            "url",
-            "version",
-            "code",
-            "referer",
-            "useragent",
-            "cache",
-            "origincode",
-            "attack-type",
-            "firewall-action",
-            "content-type"
+            'hostname',
+            'servicegroup',
+            'clientIP',
+            'uident',
+            'uname',
+            'method',
+            'url',
+            'version',
+            'code',
+            'referer',
+            'useragent',
+            'cache',
+            'origincode',
+            'attack-type',
+            'firewall-action',
+            'content-type'
         ]);
 
         // 拔除後方的反斜線

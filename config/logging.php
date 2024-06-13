@@ -152,6 +152,12 @@ return [
             'level' => 'info',
             'days' => 14,
         ],
+        'parse_log' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/parse_log.log'),
+            'level' => 'info',
+            'days' => 14,
+        ],
     ],
 
 ];
