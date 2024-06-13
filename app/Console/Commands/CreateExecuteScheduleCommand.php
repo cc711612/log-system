@@ -81,7 +81,7 @@ class CreateExecuteScheduleCommand extends Command
 
         return [
             'end_at' => $roundedTime->format('Y-m-d H:i:00'),
-            'start_at'   => $roundedTime->subMinutes($range)->format('Y-m-d H:i:00'),
+            'start_at'   => $roundedTime->subMinutes(5)->format('Y-m-d H:i:00'),
         ];
     }
 }
