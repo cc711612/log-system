@@ -37,7 +37,7 @@ class DatabaseSeeder extends Seeder
 
         app(SettingEntity::class)->create([
             'id'                                      => 1,
-            'delay_minutes'                           => 5,
+            'delay_minutes'                           => 15,
             'schedule_check_interval_minutes'         => 15,
             'task_completion_alert_threshold_minutes' => 15,
             'download_task_alert_threshold_minutes'   => 30,
