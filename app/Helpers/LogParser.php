@@ -31,20 +31,21 @@ class LogParser
                             continue;
                         }
                         return [
-                            'host'              => $matches['ip'],
-                            'uident'            => $matches['uident'],
-                            'uname'             => $matches['uname'],
-                            'rt'                => $matches['datetime'],
-                            'method'            => $matches['method'],
-                            'url'               => $matches['url'],
-                            'http_version'      => $matches['http_version'],
-                            'code'              => $matches['status'],
-                            'size'              => $matches['size'],
-                            'cache_status'      => $matches['cache_status'] ?? '',
-                            'cache_status_code' => $matches['cache_status_code'] ?? '',
-                            'cache_size'        => $matches['cache_size'] ?? '',
-                            'referer'           => $matches['referer'],
-                            'ua'                => $matches['user_agent'],
+                            'host'         => $matches['ip'],
+                            'uident'       => $matches['uident'],
+                            'uname'        => $matches['uname'],
+                            'rt'           => $matches['datetime'],
+                            'method'       => $matches['method'],
+                            'url'          => $matches['url'],
+                            'http_version' => $matches['http_version'],
+                            'code'         => $matches['status'],
+                            'size'         => $matches['size'],
+                            'cache'        => $matches['cache_status'] ?? '',
+                            'pic_bhs'      => $matches['cache_status_code'] ?? '',
+                            'pic_bt'       => $matches['cache_size'] ?? '',
+                            'tru'          => $matches['response_bytes'] ?? '',
+                            'referer'      => $matches['referer'],
+                            'ua'           => $matches['user_agent'],
                         ];
                     }
                     break;
