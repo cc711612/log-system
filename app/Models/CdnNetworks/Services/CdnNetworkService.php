@@ -201,12 +201,8 @@ class CdnNetworkService
                             break;
                         }
                         try {
-                            Log::channel('parse_log')->info($download->service_type);
-                            Log::channel('parse_log')->info($line);
                             $log = $logParser->parseLogEntry($line, $download->service_type);
-                            Log::channel('parse_log')->info($log);
                             $log['measurement'] = $download->service_type;
-                            $log['hostname'] = $download->domain_name;
                             $log['servicegroup'] = $download->control_group_name;
                         } catch (\Exception $exception) {
                             $this->status = false;
