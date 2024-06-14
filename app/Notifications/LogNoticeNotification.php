@@ -54,14 +54,14 @@ class LogNoticeNotification extends Notification
             $this->message,
         ];
 
-        return (new SlackMessage)
+        return (new SlackMessage())
             ->content(implode("\r\n", $lines))
             ->to($notifiable->slack_webhook_url);
     }
 
     public function toMail($notifiable)
     {
-        return (new MailMessage)
+        return (new MailMessage())
             ->subject('系統通知信')
             ->greeting('Hello!')
             ->line('This is the notification message: ' . $this->message)
