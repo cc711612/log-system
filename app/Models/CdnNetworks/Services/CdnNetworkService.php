@@ -200,15 +200,16 @@ class CdnNetworkService
                         if ($line == "") {
                             break;
                         }
-                        try {
-                            $log = $logParser->parseLogEntry($line, $download->service_type);
-                            $log['measurement'] = $download->service_type;
-                            $log['servicegroup'] = $download->control_group_name;
-                        } catch (\Exception $exception) {
+
+                        $log = $logParser->parseLogEntry($line, $download->service_type);
+                        if(empty($log)){
                             $this->status = false;
                             Log::error($download->service_type . " download->service_type " . $line);
                             continue;
                         }
+
+                        $log['measurement'] = $download->service_type;
+                        $log['servicegroup'] = $download->control_group_name;
 
                         $log = $this->influxDBService->handleLogFormat($log);
                         array_push($logs, $log);
