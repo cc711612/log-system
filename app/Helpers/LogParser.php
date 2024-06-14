@@ -118,7 +118,7 @@ class LogParser
 
             throw new \Exception('match error');
         } catch (\Exception $e) {
-            Log::driver('log_parse')->info('pid:' . getmypid() . 'type:' . $serviceType . ' logEntry:' . $logEntry);
+            Log::driver('log_parse')->info('pid:' . getmypid() . ' type:' . $serviceType . ' logEntry:' . $logEntry);
             Log::driver('log_parse')->info($e->getMessage());
         }
         return [];

@@ -122,41 +122,35 @@ return [
             'driver' => 'daily',
             'path' => storage_path('logs/cdn_network.log'),
             'level' => 'info',
-            'days' => 30,
+            'days' => 7,
         ],
 
         'download' => [
             'driver' => 'daily',
             'path' => storage_path('logs/download.log'),
             'level' => 'info',
-            'days' => 30,
+            'days' => 14,
         ],
 
         'execute_schedule' => [
             'driver' => 'daily',
             'path' => storage_path('logs/execute_schedule.log'),
             'level' => 'info',
-            'days' => 30,
+            'days' => 7,
         ],
 
         'influxdb' => [
             'driver' => 'daily',
             'path' => storage_path('logs/influxdb.log'),
             'level' => 'info',
-            'days' => 30,
+            'days' => 7,
         ],
 
         'log_parse' => [
             'driver' => 'daily',
             'path' => storage_path('logs/log_parse.log'),
             'level' => 'info',
-            'days' => 14,
-        ],
-        'parse_log' => [
-            'driver' => 'daily',
-            'path' => storage_path('logs/parse_log.log'),
-            'level' => 'info',
-            'days' => 14,
+            'days' => 7,
         ],
     ],
 
