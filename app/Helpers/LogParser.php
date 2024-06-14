@@ -21,7 +21,7 @@ class LogParser
             switch ($serviceType) {
                 case '1115':
                     $patterns = [
-                        '/^(?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) (?P<uident>\S+) (?P<uname>\S+) \[(?P<datetime>[^\]]+)\] "(?P<method>[A-Z]+) (?P<url>[^\s]+) (?P<http_version>HTTP\/\d\.\d)" (?P<status>\d{1,3}) (?P<size>\d+)(?: (?P<cache_status>[A-Z_]+) (?P<cache_code>\d+|-) (?P<cache_size>\d+|-) -)? "(?P<referer>[^"]*)" "(?P<user_agent>.+)"$/',
+                        '/^(?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) (?P<uident>\S+) (?P<uname>\S+) \[(?P<datetime>[^\]]+)\] "(?P<method>[A-Z]+) (?P<url>[^\s]+) (?P<http_version>HTTP\/\d\.\d)" (?P<status>\d{1,3}) (?P<size>\d+) "(?P<referer>[^"]*)" "(?P<user_agent>.+)"$/',
                         '/^(?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) (?P<uident>\S+) (?P<uname>\S+) \[(?P<datetime>[^\]]+)\] "(?P<method>[A-Z]+) (?P<url>[^\s]+) (?P<http_version>HTTP\/\d\.\d)" (?P<status>\d{1,3}) (?P<size>\d+) (?P<cache_status>[A-Z_]+)\s+(?P<cache_code>\d+|-)\s+(?P<cache_size>\d+|-)\s+(?P<response_bytes>\d+|-)\s+"(?P<referer>[^"]*)" "(?P<user_agent>.+)"$/'
                     ];
 
@@ -44,7 +44,7 @@ class LogParser
                             'referer'      => $matches['referer'],
                             'useragent'           => $matches['user_agent'],
                             'cache'        => $matches['cache_status'] ?? '',
-                            'origincode' => '',
+                            'origincode' => $matches['cache_code'] ?? '',
                             'attack-type' => '',
                             'firewall-action' => '',
                             'content-type' => '',
