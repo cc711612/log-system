@@ -27,7 +27,7 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping(5);
 
         if (config('logsystem.connection_monitor.enable')) {
-            $schedule->command('command:log_connection_monitor')
+            $schedule->command('command:log_system_monitor')
                 ->everyMinute(); // Adjust the timing as needed
         }
     }
