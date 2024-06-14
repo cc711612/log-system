@@ -110,7 +110,7 @@ class LogSystemMonitorCommand extends Command
     {
         $timeoutDownloadSchedules = $this->getTimeoutDownloadSchedules($user->id);
         if ($timeoutDownloadSchedules->count() > 0) {
-            $this->setting->notify(new LogNoticeNotification('下載排程已超過 ' . $this->setting->download_task_alert_threshold_minutes . ' 分鐘未完成，請確認是否有問題'));
+            $this->setting->notify(new LogNoticeNotification('download 排程已超過 ' . $this->setting->download_task_alert_threshold_minutes . ' 分鐘未完成，請確認是否有問題'));
         }
     }
 
@@ -124,9 +124,9 @@ class LogSystemMonitorCommand extends Command
         $lastExecuteSchedule = $this->getLastExecuteScheduleByUserId($user->id);
         if (
             !$lastExecuteSchedule
-            || now()->diffInMinutes(Carbon::parse($lastExecuteSchedule->log_time_end)) > $this->setting->schedule_check_interval_minutes
+            || now()->diffInMinutes(Carbon::parse($lastExecuteSchedule->process_time_start)) > $this->setting->schedule_check_interval_minutes
         ) {
-            $this->setting->notify(new LogNoticeNotification('會員執行排程已停止，請確認是否有問題'));
+            $this->setting->notify(new LogNoticeNotification('ExecuteSchedule 執行排程已執行超過 ' . $this->setting->schedule_check_interval_minutes . ' 分鐘未完成，請確認是否有問題'));
         }
     }
 
@@ -166,6 +166,7 @@ class LogSystemMonitorCommand extends Command
         return $downloadEntity
             ->where('user_id', $userId)
             ->where('status', 'in progress')
+            ->where('created_at', '>', now()->subHour())
             ->where('updated_at', '<', now()->subMinutes($this->setting->download_task_alert_threshold_minutes))
             ->get();
     }
