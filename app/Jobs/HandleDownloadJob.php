@@ -5,11 +5,14 @@ namespace App\Jobs;
 use App\Helpers\Enums\StatusEnum;
 use App\Models\CdnNetworks\Services\CdnNetworkService;
 use App\Models\Downloads\Entities\DownloadEntity;
+use App\Models\ExecuteSchedules\Entities\ExecuteScheduleEntity;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class HandleDownloadJob implements ShouldQueue
 {
@@ -44,21 +47,49 @@ class HandleDownloadJob implements ShouldQueue
     {
         ini_set('max_execution_time', $this->timeout);
 
-        $DownloadEntity =
-            app(DownloadEntity::class)
-                ->where("status", StatusEnum::INITIAL->value)
-                ->find($this->download_id);
+        $downloadEntity = $this->getDownloadEntity();
+        /**
+         * @var CdnNetworkService $cdnNetworkService
+         */
+        $cdnNetworkService  = app(CdnNetworkService::class);
 
-        if (is_null($DownloadEntity) == false){
-            $DownloadEntity->status = StatusEnum::PROCESSING->value;
-            $DownloadEntity->save();
+        if (is_null($downloadEntity) == false) {
+            $downloadEntity->status = StatusEnum::PROCESSING->value;
+            $downloadEntity->save();
 
             # 取得 DownloadEntity
-            app(CdnNetworkService::class)
-                ->processLogByDownload($DownloadEntity);
+            $cdnNetworkService
+                ->processLogByDownload($downloadEntity);
         }
     }
 
+
+    public function failed(?Throwable $exception): void
+    {
+        $downloadEntity = $this->getDownloadEntity();
+        // update
+        if ($downloadEntity) {
+            $downloadEntity->status = StatusEnum::FAILURE->value;
+            $downloadEntity->save();
+            ExecuteScheduleEntity::where('id', $downloadEntity->execute_schedule_id)
+                ->update(['status' => StatusEnum::FAILURE->value]);
+        }
+
+        Log::error($exception->getMessage());
+    }
+
+    /**
+     * find download entity
+     *
+     * @param int $download_id
+     * @return DownloadEntity
+     */
+    private function getDownloadEntity()
+    {
+        return app(DownloadEntity::class)
+            ->where("status", StatusEnum::INITIAL->value)
+            ->find($this->download_id);
+    }
 
     /**
      * @param $name
