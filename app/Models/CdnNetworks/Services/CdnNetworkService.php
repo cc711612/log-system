@@ -2,9 +2,9 @@
 
 namespace App\Models\CdnNetworks\Services;
 
-use App\Exceptions\LogFileExtensionException;
 use App\Exceptions\LogProcessException;
 use App\Helpers\CDNNetwork;
+use App\Helpers\Enums\StatusEnum;
 use App\Helpers\LogParser;
 use App\Models\Downloads\Entities\DownloadEntity;
 use App\Models\ExecuteSchedules\Entities\ExecuteScheduleEntity;
@@ -202,7 +202,7 @@ class CdnNetworkService
                         }
 
                         $log = $logParser->parseLogEntry($line, $download->service_type);
-                        if(empty($log)){
+                        if (empty($log)) {
                             $this->status = false;
                             Log::error($download->service_type . " download->service_type " . $line);
                             continue;
@@ -228,9 +228,9 @@ class CdnNetworkService
                 }
 
                 if ($this->status == true) {
-                    $download = $this->updateDownLoad($download, ["type" => "done", "status" => "success"]);
+                    $download = $this->updateDownLoad($download, ["type" => "done", "status" => StatusEnum::SUCCESS->value]);
                 } else {
-                    $this->updateDownLoad($download, ["status" => "failure"]);
+                    $this->updateDownLoad($download, ["status" => StatusEnum::FAILURE->value]);
                 }
 
                 # 檢查執行的 execute_schedule_id 是否為最後一筆
@@ -245,7 +245,7 @@ class CdnNetworkService
                     app(ExecuteScheduleEntity::class)
                         ->find($download->execute_schedule_id)
                         ->update([
-                            'status' => ($DownloadStatusEntities->contains("failure") == false) ? "success" : "failure",
+                            'status' => ($DownloadStatusEntities->contains(StatusEnum::FAILURE->value) == false) ? StatusEnum::SUCCESS->value : StatusEnum::FAILURE->value,
                             'process_time_end' => now()->toDateTimeString()
                         ]);
                 }
@@ -317,7 +317,7 @@ class CdnNetworkService
             $count++;
             Log::channel('influxdb')->info(sprintf("pid:%s , 第%s次新增失敗", getmypid(), $count));
             Log::channel('influxdb')->error($exception->getMessage());
-            sleep(60);
+            sleep(config('influxdb.sleep'));
             return $this->insertInfluxDB($logs, $count);
         }
     }

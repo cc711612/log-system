@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Helpers\Enums\StatusEnum;
 use App\Models\CdnNetworks\Services\CdnNetworkService;
 use App\Models\Downloads\Entities\DownloadEntity;
 use Illuminate\Bus\Queueable;
@@ -45,11 +46,11 @@ class HandleDownloadJob implements ShouldQueue
 
         $DownloadEntity =
             app(DownloadEntity::class)
-                ->where("status", "initial")
+                ->where("status", StatusEnum::INITIAL->value)
                 ->find($this->download_id);
 
         if (is_null($DownloadEntity) == false){
-            $DownloadEntity->status = "in progress";
+            $DownloadEntity->status = StatusEnum::PROCESSING->value;
             $DownloadEntity->save();
 
             # 取得 DownloadEntity

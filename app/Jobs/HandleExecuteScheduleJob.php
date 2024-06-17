@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Helpers\Enums\StatusEnum;
 use App\Models\CdnNetworks\Services\CdnNetworkService;
 use App\Models\Downloads\Entities\DownloadEntity;
 use App\Models\ExecuteSchedules\Entities\ExecuteScheduleEntity;
@@ -73,8 +74,7 @@ class HandleExecuteScheduleJob implements ShouldQueue
 
         $this->startInfo(sprintf('ExecuteScheduleEntity id = %s', $this->execute_schedule_id));
         // 修改執行時間
-        $executeScheduleEntity->update(["process_time_start" => now()->toDateTimeString(), "status" => "in progress"]);
-//        $executeScheduleEntity->update(["status" => "initial"]);
+        $executeScheduleEntity->update(["process_time_start" => now()->toDateTimeString(), "status" => StatusEnum::PROCESSING->value]);
 
         $this->initCdnNetworkService();
         $domainToServiceType = $this->getDomainToServiceType();
@@ -110,8 +110,8 @@ class HandleExecuteScheduleJob implements ShouldQueue
                                 'control_group_code' => !empty($controlGroupByDomain[$DomainLogData['domainName']]) ? $controlGroupByDomain[$DomainLogData['domainName']]['controlGroupCode'] : null,
                                 'log_time_start' => $this->handleDateTimeFormat(Arr::get($DownloadLinks, 'dateFrom')),
                                 'log_time_end' => $this->handleDateTimeFormat(Arr::get($DownloadLinks, 'dateTo'), 59),
-                                'type' => 'initial',
-                                'status' => 'initial',
+                                'type' => StatusEnum::INITIAL->value,
+                                'status' => StatusEnum::INITIAL->value,
                             ];
                         $DownloadEntity =
                             app(DownloadEntity::class)
@@ -128,7 +128,6 @@ class HandleExecuteScheduleJob implements ShouldQueue
                 unset($count);
                 $this->startInfo('開始儲存 下載連結');
             } else {
-//                    $executeScheduleEntity->update(['status' => 'failure']);
                 $this->errorInfo('getDownloadLinkByDomains 回傳資料為空');
             }
             sleep(1);

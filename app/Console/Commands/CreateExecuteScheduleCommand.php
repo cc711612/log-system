@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Helpers\Enums\StatusEnum;
 use App\Models\ExecuteSchedules\Entities\ExecuteScheduleEntity;
 use App\Models\Settings\Entities\SettingEntity;
 use App\Models\Users\Entities\UserEntity;
@@ -54,13 +55,13 @@ class CreateExecuteScheduleCommand extends Command
                         'user_id'            => $userEntity->id,
                         'log_time_start'     => Arr::get($timeRange, 'start_at'),
                         'log_time_end'       => Arr::get($timeRange, 'end_at'),
-                        //                        'status'             => 'initial',
+                        //                        'status'             => StatusEnum::INITIAL->value,
                     ],
                     [
                         'user_id'            => $userEntity->id,
                         'log_time_start'     => Arr::get($timeRange, 'start_at'),
                         'log_time_end'       => Arr::get($timeRange, 'end_at'),
-                        'status'             => 'initial',
+                        'status'             => StatusEnum::INITIAL->value,
                         'process_time_start' => null,
                         'process_time_end'   => null,
                     ]

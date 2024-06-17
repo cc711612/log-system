@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Helpers\Enums\StatusEnum;
 use App\Models\ExecuteSchedules\Entities\ExecuteScheduleEntity;
 use App\Models\Settings\Entities\SettingEntity;
 use App\Models\Users\Entities\UserEntity;
@@ -52,7 +53,7 @@ class DatabaseSeeder extends Seeder
                 'user_id'        => 1,
                 'log_time_start' => '2024-05-31 20:05:00',
                 'log_time_end'   => '2024-05-31 20:10:00',
-                'status'         => 'initial',
+                'status'         => StatusEnum::INITIAL->value,
             ]);
 
         app(ExecuteScheduleEntity::class)->create(
@@ -61,7 +62,7 @@ class DatabaseSeeder extends Seeder
                 'user_id'        => 1,
                 'log_time_start' => '2024-05-31 20:10:00',
                 'log_time_end'   => '2024-05-31 20:15:00',
-                'status'         => 'initial',
+                'status'         => StatusEnum::INITIAL->value,
             ]);
     }
 }

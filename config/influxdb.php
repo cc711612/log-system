@@ -8,4 +8,5 @@ return [
     'bucket' => env('INFLUXDB_BUCKET', ''),
     'org' => env('INFLUXDB_ORG', 'myorg'),
     'insertCount' => env('INFLUXDB_INSERT_COUNT', 1000),
+    'sleep' => env('INFLUXDB_SLEEP', 60),
 ];

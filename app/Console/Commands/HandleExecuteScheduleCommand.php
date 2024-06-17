@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Helpers\Enums\StatusEnum;
 use App\Jobs\HandleExecuteScheduleJob;
 use App\Models\ExecuteSchedules\Entities\ExecuteScheduleEntity;
 use App\Models\Settings\Entities\SettingEntity;
@@ -48,7 +49,7 @@ class HandleExecuteScheduleCommand extends Command
         // 取得列表
         $executeScheduleEntities =
             app(ExecuteScheduleEntity::class)
-                ->where('status', 'initial')
+                ->where('status', StatusEnum::INITIAL->value)
                 ->get();
 
         // 取得設定
@@ -71,7 +72,7 @@ class HandleExecuteScheduleCommand extends Command
                 Arr::get($userEntity, 'tswd_token'),
                 Arr::get($setting, 'domain_list_chuck', 500)
             );
-            $executeScheduleEntity->status = 'queue';
+            $executeScheduleEntity->status = StatusEnum::QUEUE->value;
             $executeScheduleEntity->save();
         });
 

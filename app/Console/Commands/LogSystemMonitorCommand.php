@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Helpers\Enums\StatusEnum;
 use App\Helpers\InfluxDB;
 use App\Models\Downloads\Entities\DownloadEntity;
 use App\Models\ExecuteSchedules\Entities\ExecuteScheduleEntity;
@@ -165,7 +166,7 @@ class LogSystemMonitorCommand extends Command
 
         return $downloadEntity
             ->where('user_id', $userId)
-            ->where('status', 'in progress')
+            ->where('status', StatusEnum::PROCESSING->value)
             ->where('created_at', '>', now()->subHour())
             ->where('updated_at', '<', now()->subMinutes($this->setting->download_task_alert_threshold_minutes))
             ->get();
