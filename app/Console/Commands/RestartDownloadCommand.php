@@ -31,9 +31,16 @@ class RestartDownloadCommand extends Command
         } else {
             $downloadIds = $this->getDownloadIds();
         }
-        foreach ($downloadIds as $downloadId) {
-            HandleDownloadJob::dispatch($downloadId);
+
+        $downloadChunkIds = array_chunk($downloadIds, 500);
+
+        foreach ($downloadChunkIds as $downloadIds) {
+            foreach ($downloadIds as $downloadId) {
+                HandleDownloadJob::dispatch($downloadId);
+            }
+            $this->updateDownloadByIds($downloadIds);
         }
+
         $this->info('已重新啟動 download jobs : ' . implode(',', $downloadIds));
     }
 
@@ -58,5 +65,11 @@ class RestartDownloadCommand extends Command
             ->get()
             ->pluck('id')
             ->toArray();
+    }
+
+    private function updateDownloadByIds($downloadIds)
+    {
+        return DownloadEntity::whereIn('id', $downloadIds)
+            ->update(['status' => StatusEnum::INITIAL->value]);
     }
 }

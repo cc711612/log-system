@@ -72,7 +72,10 @@ class HandleDownloadJob implements ShouldQueue
             $downloadEntity->status = StatusEnum::FAILURE->value;
             $downloadEntity->save();
             ExecuteScheduleEntity::where('id', $downloadEntity->execute_schedule_id)
-                ->update(['status' => StatusEnum::FAILURE->value]);
+                ->update([
+                    'status' => StatusEnum::FAILURE->value,
+                    'error_message' => $exception->getMessage()
+                ]);
         }
 
         Log::error($exception->getMessage());
@@ -87,7 +90,6 @@ class HandleDownloadJob implements ShouldQueue
     private function getDownloadEntity()
     {
         return app(DownloadEntity::class)
-            ->where("status", StatusEnum::INITIAL->value)
             ->find($this->download_id);
     }
 
