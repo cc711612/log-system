@@ -167,13 +167,13 @@ class CdnNetworkService
          */
         $this->influxDBService = new InfluxDBService($download->users->influx_db_connection, $download->users->influx_db_token, $download->users->influx_db_org, $download->users->influx_db_bucket);
         try {
+            $download = $this->updateDownLoad($download, ['pid' => getmypid(), "type" => "download"]);
             $downloadLink = $download->url;
             $parsedUrl = parse_url($downloadLink);
             // 提取 URL 路徑部分
             $path = $parsedUrl['path'];
             // 從路徑中提取文件名
             $fileName = basename($path);
-            $download = $this->updateDownLoad($download, ['pid' => getmypid(), "type" => "download"]);
             $response = Http::retry(5, 1000)->withHeaders(['Accept-Encoding' => 'gzip,deflate'])->get($downloadLink);
             if ($response->successful()) {
                 // 將日誌內容存儲到本地文件
@@ -190,7 +190,7 @@ class CdnNetworkService
                     Log::channel('download')->error('檔案格式錯誤，只支持.gz格式的日誌文件，檔案格式為:' . $fileInfo['extension']);
                 }
 
-                if ($this->status == true) {
+                if ($this->status) {
                     // 解析每一行日誌條目
                     $download = $this->updateDownLoad($download, ["type" => "parse"]);
 
@@ -227,25 +227,25 @@ class CdnNetworkService
                     }
                 }
 
-                if ($this->status == true) {
+                if ($this->status) {
                     $download = $this->updateDownLoad($download, ["type" => "done", "status" => StatusEnum::SUCCESS->value]);
                 } else {
                     $this->updateDownLoad($download, ["status" => StatusEnum::FAILURE->value]);
                 }
 
                 # 檢查執行的 execute_schedule_id 是否為最後一筆
-                $DownloadStatusEntities =
+                $downloadStatusEntities =
                     app(DownloadEntity::class)
                     ->selectRaw("DISTINCT status")
                     ->where("execute_schedule_id", $download->execute_schedule_id)
                     ->get()
                     ->pluck("status");
 
-                if ($DownloadStatusEntities->contains("in process") == false) {
+                if ($downloadStatusEntities->contains("in process") == false) {
                     app(ExecuteScheduleEntity::class)
                         ->find($download->execute_schedule_id)
                         ->update([
-                            'status' => ($DownloadStatusEntities->contains(StatusEnum::FAILURE->value) == false) ? StatusEnum::SUCCESS->value : StatusEnum::FAILURE->value,
+                            'status' => ($downloadStatusEntities->contains(StatusEnum::FAILURE->value) == false) ? StatusEnum::SUCCESS->value : StatusEnum::FAILURE->value,
                             'process_time_end' => now()->toDateTimeString()
                         ]);
                 }
@@ -253,6 +253,9 @@ class CdnNetworkService
             // 刪除解壓後的文件
             Storage::disk($this->driver)->delete($fileInfo['filename']);
         } catch (LogProcessException $e) {
+            $download->status = StatusEnum::FAILURE->value;
+            $download->error_message = $e->getMessage();
+            $download->save();
             Log::error($e->getMessage());
         }
     }

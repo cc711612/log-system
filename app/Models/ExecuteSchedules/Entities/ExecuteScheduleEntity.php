@@ -18,6 +18,7 @@ class ExecuteScheduleEntity extends Model
         'log_time_start',
         'log_time_end',
         'status',
+        'error_message',
         'process_time_start',
         'process_time_end',
     ];

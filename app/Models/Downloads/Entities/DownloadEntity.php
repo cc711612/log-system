@@ -18,6 +18,7 @@ class DownloadEntity extends Model
         'execute_schedule_id',
         'url',
         'pid', // 'PID'
+        'error_message',
         'domain_name',
         'service_type',
         'control_group_name',

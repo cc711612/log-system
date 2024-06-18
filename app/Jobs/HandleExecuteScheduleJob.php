@@ -50,8 +50,7 @@ class HandleExecuteScheduleJob implements ShouldQueue
         $account,
         $token,
         $setting_domain_list_chuck
-    )
-    {
+    ) {
         $this->onQueue('handle_execute_schedule');
 
         $this->execute_schedule_id = $execute_schedule_id;
@@ -70,7 +69,7 @@ class HandleExecuteScheduleJob implements ShouldQueue
 
         $executeScheduleEntity =
             app(ExecuteScheduleEntity::class)
-                ->find($this->execute_schedule_id);
+            ->find($this->execute_schedule_id);
 
         $this->startInfo(sprintf('ExecuteScheduleEntity id = %s', $this->execute_schedule_id));
         // 修改執行時間
@@ -82,7 +81,7 @@ class HandleExecuteScheduleJob implements ShouldQueue
 
         // 500 個一組
         $userDomainLists = array_chunk(array_keys($domainToServiceType), $this->setting_domain_list_chunk);
-
+        $isEmptyDownload = false;
         foreach ($userDomainLists as $domainLists) {
             // 取得下載連結
             $downloadLinkLists =
@@ -93,11 +92,12 @@ class HandleExecuteScheduleJob implements ShouldQueue
                 );
 
             if ($downloadLinkLists != false && empty($downloadLinkLists['logs']) == false) {
+                $isEmptyDownload = true;
                 $this->startInfo('開始儲存 下載連結');
                 // 儲存下載連結
                 $count = 1;
                 foreach ($downloadLinkLists['logs'] as $DomainLogData) {
-                    $this->startInfo(sprintf('下載 %s 的 downloads',$DomainLogData['domainName']));
+                    $this->startInfo(sprintf('下載 %s 的 downloads', $DomainLogData['domainName']));
                     foreach ($DomainLogData['files'] as $DownloadLinks) {
                         $insertData =
                             [
@@ -113,15 +113,15 @@ class HandleExecuteScheduleJob implements ShouldQueue
                                 'type' => StatusEnum::INITIAL->value,
                                 'status' => StatusEnum::INITIAL->value,
                             ];
-                        $DownloadEntity =
+                        $downloadEntity =
                             app(DownloadEntity::class)
-                                ->firstOrCreate(
-                                    Arr::only($insertData, ["user_id", "domain_name", "log_time_start", "log_time_end"]) ,
-                                    $insertData
-                                );
+                            ->firstOrCreate(
+                                Arr::only($insertData, ["user_id", "domain_name", "log_time_start", "log_time_end"]),
+                                $insertData
+                            );
 
-                        HandleDownloadJob::dispatch($DownloadEntity->id);
-                        $this->startInfo(sprintf('第 %s 次 insert',$count));
+                        HandleDownloadJob::dispatch($downloadEntity->id);
+                        $this->startInfo(sprintf('第 %s 次 insert', $count));
                         $count++;
                     }
                 }
@@ -131,6 +131,15 @@ class HandleExecuteScheduleJob implements ShouldQueue
                 $this->errorInfo('getDownloadLinkByDomains 回傳資料為空');
             }
             sleep(1);
+        }
+
+        // 無下載連結
+        if (!$isEmptyDownload) {
+            $this->errorInfo('無下載連結');
+            $executeScheduleEntity->update([
+                "status" => StatusEnum::SUCCESS->value,
+                'error_message' => 'download link is empty'
+            ]);
         }
 
         $this->endInfo(sprintf('ExecuteScheduleEntity id = %s', $executeScheduleEntity->id));
@@ -145,8 +154,8 @@ class HandleExecuteScheduleJob implements ShouldQueue
     {
         $this->cdnNetworkService =
             app(CdnNetworkService::class)
-                ->setAccount($this->account)
-                ->setToken($this->token);
+            ->setAccount($this->account)
+            ->setToken($this->token);
 
         return $this;
     }
@@ -172,8 +181,8 @@ class HandleExecuteScheduleJob implements ShouldQueue
 
         $domainLists =
             $this
-                ->getCdnNetworkService()
-                ->getDomainList();
+            ->getCdnNetworkService()
+            ->getDomainList();
 
         if (empty($domainLists) == true) {
             $this->errorInfo(debug_backtrace()[0]['function'] . ' 為空值');
@@ -221,20 +230,19 @@ class HandleExecuteScheduleJob implements ShouldQueue
         $domainLists,
         $start_at,
         $end_at
-    )
-    {
+    ) {
         $this->startInfo(debug_backtrace()[0]['function']);
 
         // 取得下載連結
         $downloadLinkLists =
             $this->getCdnNetworkService()
-                ->getDownloadLinkByDomains(
-                    $domainLists,
-                    [
-                        $start_at,
-                        $end_at,
-                    ]
-                );
+            ->getDownloadLinkByDomains(
+                $domainLists,
+                [
+                    $start_at,
+                    $end_at,
+                ]
+            );
 
         $this->endInfo(debug_backtrace()[0]['function']);
 
