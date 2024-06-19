@@ -22,4 +22,9 @@ class ElasticsearchService
             $this->client->createBatch($logs);
         }
     }
+
+    public function isServiceRunning()
+    {
+        return $this->client->isServiceRunning();
+    }
 }
