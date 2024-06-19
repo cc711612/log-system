@@ -19,21 +19,24 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         app(UserEntity::class)->create([
-            'display_name'         => 'Admin',
-            'product_type'         => 'tswd',
-            'account'              => 'admin',
-            'password'             => Hash::make(
+            'display_name'             => 'Admin',
+            'product_type'             => 'tswd',
+            'account'                  => 'admin',
+            'password'                 => Hash::make(
                 '15456123'
             ),
-            'email'                => 'cc711612@gmail.com',
-            'tswd_account'         => config('services.tswd.account'),
-            'tswd_token'           => config('services.tswd.token'),
-            'cf_account'           => null,
-            'cf_token'             => null,
-            'influx_db_connection' => config('influxdb.host'),
-            'influx_db_bucket'     => config('influxdb.bucket'),
-            'influx_db_token'      => config('influxdb.token'),
-            'influx_db_org'        => config('influxdb.org'),
+            'email'                    => 'cc711612@gmail.com',
+            'tswd_account'             => config('services.tswd.account'),
+            'tswd_token'               => config('services.tswd.token'),
+            'cf_account'               => null,
+            'cf_token'                 => null,
+            'elasticsearch_connection' => 'http://172.234.90.209:9200',
+            'elasticsearch_token'      => 'RGxfbEtwQUJqME1lSWlRdVU2YjM6MkNrN3VxQTVULVNoMkFQOXlIS2lTZw',
+            'elasticsearch_index'      => 'test_log',
+            'influx_db_connection'     => config('influxdb.host'),
+            'influx_db_bucket'         => config('influxdb.bucket'),
+            'influx_db_token'          => config('influxdb.token'),
+            'influx_db_org'            => config('influxdb.org'),
         ]);
 
         app(SettingEntity::class)->create([
@@ -44,7 +47,7 @@ class DatabaseSeeder extends Seeder
             'download_task_alert_threshold_minutes'   => 30,
             'domain_list_chuck'                       => 500,
             'slack_webhook_url'                       => env('SLACK_WEBHOOK_URL'),
-            'email'                                   => 'cc711612@gmail.com'
+            'email'                                   => 'cc711612@gmail.com',
         ]);
 
         app(ExecuteScheduleEntity::class)->create(
