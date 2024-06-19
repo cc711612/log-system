@@ -168,7 +168,7 @@ class CdnNetworkService
          * @var ElasticsearchService
          */
         $this->elasticsearchService = new ElasticsearchService(
-            [$download->users->elasticsearch_connection],
+            $download->users->elasticsearch_connection,
             $download->users->elasticsearch_token,
             $download->users->elasticsearch_index
         );
