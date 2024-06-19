@@ -22,7 +22,8 @@ class LogParser
                 case '1115':
                     $patterns = [
                         '/^(?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) (?P<uident>\S+) (?P<uname>\S+) \[(?P<datetime>[^\]]+)\] "(?P<method>[A-Z]+) (?P<url>[^\s]+) (?P<http_version>HTTP\/\d\.\d)" (?P<status>\d{1,3}) (?P<size>\d+) "(?P<referer>[^"]*)" "(?P<user_agent>.+)"$/',
-                        '/^(?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) (?P<uident>\S+) (?P<uname>\S+) \[(?P<datetime>[^\]]+)\] "(?P<method>[A-Z]+) (?P<url>[^\s]+) (?P<http_version>HTTP\/\d\.\d)" (?P<status>\d{1,3}) (?P<size>\d+) (?P<cache_status>[A-Z_]+)\s+(?P<cache_code>\d+|-)\s+(?P<cache_size>\d+|-)\s+(?P<response_bytes>\d+|-)\s+"(?P<referer>[^"]*)" "(?P<user_agent>.+)"$/'
+                        '/^(?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) (?P<uident>\S+) (?P<uname>\S+) \[(?P<datetime>[^\]]+)\] "(?P<method>[A-Z]+) (?P<url>[^\s]+) (?P<http_version>HTTP\/\d\.\d)" (?P<status>\d{1,3}) (?P<size>\d+) (?P<cache_status>[A-Z_]+)\s+(?P<cache_code>\d+|-)\s+(?P<cache_size>\d+|-)\s+(?P<response_bytes>\d+|-)\s+"(?P<referer>[^"]*)" "(?P<user_agent>.+)"$/',
+                        '/^(?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) - - \[(?P<datetime>[^\]]+)\] "(?P<method>[A-Z]+) (?P<url>[^\s]+) (?P<http_version>HTTP\/\d\.\d)" (?P<status>\d{3}) (?P<size>\d+) (?P<cache_status>[A-Z_]+) (?P<cache_code>\d+) (?P<cache_size>\d+) (?P<response_bytes>\d+) "(?P<referer>[^"]*)" "(?P<user_agent>[^"]*)"?$/'
                     ];
 
                     foreach ($patterns as $pattern) {
@@ -35,8 +36,8 @@ class LogParser
                             'servicegroup' => '',
                             'timestamp' => $matches['datetime'],
                             'clientIP' => $matches['ip'],
-                            'uident'       => $matches['uident'],
-                            'uname'        => $matches['uname'],
+                            'uident'       => $matches['uident'] ?? '',
+                            'uname'        => $matches['uname'] ?? '',
                             'method'       => $matches['method'],
                             'url'          => $matches['url'],
                             'version' => $matches['http_version'],
@@ -85,30 +86,40 @@ class LogParser
                     break;
                 case '1551':
                     // %host %uident %uname [%rt] "%method %url %rp" %code %size "%referer" "%ua" "%aty" "%ra" "%Content-Type"
-                    $pattern = '/^(?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) (?P<uident>\S+) (?P<uname>\S+) \[(?P<datetime>[^\]]+)\] "(?P<method>[A-Z]+) (?P<url>[^\s]+) (?P<http_version>[^"]+)" (?P<code>\d{1,3}) (?P<size>\d+) "(?P<referer>[^"]*)" "(?P<user_agent>[^"]*)" "(?P<aty>[^"]*)" "(?P<ra>[^"]*)" "(?P<Content_Type>.+)"$/';
-                    preg_match($pattern, $logEntry, $matches);
-                    return [
-                        'hostname'         => parse_url($matches['url'], PHP_URL_HOST),
-                        'servicegroup' => '',
-                        'timestamp' => $matches['datetime'],
-                        'clientIP' => $matches['ip'],
-                        'uident'       => $matches['uident'],
-                        'uname'        => $matches['uname'],
-                        'method'       => $matches['method'],
-                        'url'          => $matches['url'],
-                        'version' => $matches['http_version'],
-                        'code'         => $matches['code'],
-                        'referer'      => $matches['referer'],
-                        'useragent'           => $matches['user_agent'],
-                        'cache'        => '',
-                        'origincode' => '',
-                        'attack-type' => $matches['aty'],
-                        'firewall-action' => $matches['ra'],
-                        'content-type' => $matches['Content_Type'],
-                        'size'         => $matches['size'],
-                        'origin-responsetime' => '',
-                        'origin-turnaroundtime' => '',
+                    $patterns = [
+                        '/^(?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) (?P<uident>\S+) (?P<uname>\S+) \[(?P<datetime>[^\]]+)\] "(?P<method>[A-Z]+) (?P<url>[^\s]+) (?P<http_version>[^"]+)" (?P<code>\d{1,3}) (?P<size>\d+) "(?P<referer>[^"]*)" "(?P<user_agent>[^"]*)" "(?P<aty>[^"]*)" "(?P<ra>[^"]*)" "(?P<Content_Type>.+)"$/',
+                        '/^(?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) \S+ \S+ \[(?P<datetime>[^\]]+)\] "(?P<method>[A-Z]+) (?P<url>[^"]+) (?P<http_version>[^"]+)" (?P<code>\d{3}) (?P<size>\d+) "(?P<referer>[^"]*)" "(?P<user_agent>[^"]*)/'
                     ];
+
+                    foreach ($patterns as $pattern) {
+                        preg_match($pattern, $logEntry, $matches);
+                        if (empty($matches) == true) {
+                            continue;
+                        }
+
+                        return [
+                            'hostname'         => parse_url($matches['url'], PHP_URL_HOST),
+                            'servicegroup' => '',
+                            'timestamp' => $matches['datetime'],
+                            'clientIP' => $matches['ip'],
+                            'uident'       => $matches['uident'] ?? '',
+                            'uname'        => $matches['uname'] ?? '',
+                            'method'       => $matches['method'],
+                            'url'          => $matches['url'],
+                            'version' => $matches['http_version'] ?? '',
+                            'code'         => $matches['code'],
+                            'referer'      => $matches['referer'] ?? '',
+                            'useragent'           => $matches['user_agent'],
+                            'cache'        => '',
+                            'origincode' => '',
+                            'attack-type' => $matches['aty'] ?? '',
+                            'firewall-action' => $matches['ra'] ?? '',
+                            'content-type' => $matches['Content_Type'] ?? '',
+                            'size'         => $matches['size'] ?? '',
+                            'origin-responsetime' => '',
+                            'origin-turnaroundtime' => '',
+                        ];
+                    }
 
                     break;
                 default:
