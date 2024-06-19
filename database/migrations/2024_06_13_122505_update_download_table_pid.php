@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('downloads', function (Blueprint $table) {
-            $table->unsignedTinyInteger('pid')->nullable()->comment('PID')->after('execute_schedule_id'); // 執行 ID，必須
+            $table->unsignedBigInteger('pid')->nullable()->comment('PID')->after('execute_schedule_id'); // 執行 ID，必須
         });
     }
 
