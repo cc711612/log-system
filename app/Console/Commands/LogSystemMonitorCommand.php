@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Helpers\Elasticsearch;
 use App\Helpers\Enums\StatusEnum;
 use App\Helpers\InfluxDB;
 use App\Models\Downloads\Entities\DownloadEntity;
@@ -60,6 +61,7 @@ class LogSystemMonitorCommand extends Command
             $this->info('User: ' . $user->name);
             // 檢查 connection
             $this->checkConnection($user);
+            die();
             // 檢查是否有執行排程
             $this->checkExecuteSchedules($user);
             // 檢查下載排程
@@ -98,6 +100,24 @@ class LogSystemMonitorCommand extends Command
                 $this->info('InfluxDB connection failed');
                 $this->setting->notify(new LogNoticeNotification('InfluxDB connection failed'));
                 Log::error('userId:' . $user->id . ',InfluxDB connection failed');
+            }
+        }
+
+        if ($user->elasticsearch_connection) {
+            
+            // 檢查 elasticsearch 連線
+            $elasticsearch = new Elasticsearch(
+                [$user->elasticsearch_connection],
+                $user->elasticsearch_token,
+                $user->elasticsearch_index
+            );
+
+            if ($elasticsearch->isServiceRunning()) {
+                $this->info('Elasticsearch connection OK');
+            } else {
+                $this->info('Elasticsearch connection failed');
+                $this->setting->notify(new LogNoticeNotification('Elasticsearch connection failed'));
+                Log::error('userId:' . $user->id . ',Elasticsearch connection failed');
             }
         }
     }

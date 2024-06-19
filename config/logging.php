@@ -146,6 +146,13 @@ return [
             'days' => 7,
         ],
 
+        'elasticsearch' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/elasticsearch.log'),
+            'level' => 'info',
+            'days' => 7,
+        ],
+
         'log_parse' => [
             'driver' => 'daily',
             'path' => storage_path('logs/log_parse.log'),

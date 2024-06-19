@@ -41,6 +41,8 @@ class CdnNetworkService
 
     private $influxDBService;
 
+    private $elasticsearchService;
+
     public function setAccount(string $account)
     {
         $this->account = $account;
@@ -163,9 +165,13 @@ class CdnNetworkService
          */
         $logParser = app(LogParser::class);
         /**
-         * @var InfluxDBService
+         * @var ElasticsearchService
          */
-        $this->influxDBService = new InfluxDBService($download->users->influx_db_connection, $download->users->influx_db_token, $download->users->influx_db_org, $download->users->influx_db_bucket);
+        $this->elasticsearchService = new ElasticsearchService(
+            $download->users->elasticsearch_connection,
+            $download->users->elasticsearch_token,
+            $download->users->elasticsearch_index
+        );
         try {
             $download = $this->updateDownLoad($download, ['pid' => getmypid(), "type" => "download"]);
             $downloadLink = $download->url;
@@ -211,19 +217,18 @@ class CdnNetworkService
                         $log['measurement'] = $download->service_type;
                         $log['servicegroup'] = $download->control_group_name;
 
-                        $log = $this->influxDBService->handleLogFormat($log);
                         array_push($logs, $log);
 
                         $count++;
-                        if ($count >= config('influxdb.insertCount')) {
-                            $this->insertInfluxDB($logs);
+                        if ($count >= config('elasticsearch.insertCount')) {
+                            $this->insertElasticsearch($logs);
                             $count = 0;
                             $logs = [];
                         }
                     }
 
                     if (empty($logs) == false) {
-                        $this->insertInfluxDB($logs);
+                        $this->insertElasticsearch($logs);
                     }
                 }
 
@@ -322,6 +327,24 @@ class CdnNetworkService
             Log::channel('influxdb')->error($exception->getMessage());
             sleep(config('influxdb.sleep'));
             return $this->insertInfluxDB($logs, $count);
+        }
+    }
+
+    private function insertElasticsearch($logs, $count = 0)
+    {
+        try {
+            $this->elasticsearchService->insertLogs($logs);
+            return true;
+        } catch (\Exception $exception) {
+            if ($count == 3) {
+                $this->status = false;
+                return false;
+            }
+            $count++;
+            Log::channel('elasticsearch')->info(sprintf("pid:%s , 第%s次新增失敗", getmypid(), $count));
+            Log::channel('elasticsearch')->error($exception->getMessage());
+            sleep(config('elasticsearch.sleep'));
+            return $this->insertElasticsearch($logs, $count);
         }
     }
 }
