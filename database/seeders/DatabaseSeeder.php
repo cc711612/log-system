@@ -50,22 +50,22 @@ class DatabaseSeeder extends Seeder
             'email'                                   => 'cc711612@gmail.com',
         ]);
 
-        app(ExecuteScheduleEntity::class)->create(
-            [
-                'id'             => 1,
-                'user_id'        => 1,
-                'log_time_start' => '2024-05-31 20:05:00',
-                'log_time_end'   => '2024-05-31 20:10:00',
-                'status'         => StatusEnum::INITIAL->value,
-            ]);
-
-        app(ExecuteScheduleEntity::class)->create(
-            [
-                'id'             => 2,
-                'user_id'        => 1,
-                'log_time_start' => '2024-05-31 20:10:00',
-                'log_time_end'   => '2024-05-31 20:15:00',
-                'status'         => StatusEnum::INITIAL->value,
-            ]);
+//        app(ExecuteScheduleEntity::class)->create(
+//            [
+//                'id'             => 1,
+//                'user_id'        => 1,
+//                'log_time_start' => '2024-05-31 20:05:00',
+//                'log_time_end'   => '2024-05-31 20:10:00',
+//                'status'         => StatusEnum::INITIAL->value,
+//            ]);
+//
+//        app(ExecuteScheduleEntity::class)->create(
+//            [
+//                'id'             => 2,
+//                'user_id'        => 1,
+//                'log_time_start' => '2024-05-31 20:10:00',
+//                'log_time_end'   => '2024-05-31 20:15:00',
+//                'status'         => StatusEnum::INITIAL->value,
+//            ]);
     }
 }
