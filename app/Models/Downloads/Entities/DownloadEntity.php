@@ -42,6 +42,7 @@ class DownloadEntity extends Model
         return $this->belongsTo(UserEntity::class, 'user_id', 'id')
             ->select([
                 'id',
+                'elasticsearch_connection',
                 'elasticsearch_token',
                 'elasticsearch_index'
             ]);
