@@ -40,6 +40,11 @@ class DownloadEntity extends Model
     public function users()
     {
         return $this->belongsTo(UserEntity::class, 'user_id', 'id')
-            ->select(['id', 'influx_db_connection', 'influx_db_bucket', 'influx_db_token', 'influx_db_org','elasticsearch_token','elasticsearch_index','elasticsearch_connection']);
+            ->select([
+                'id',
+                'elasticsearch_connection',
+                'elasticsearch_token',
+                'elasticsearch_index'
+            ]);
     }
 }

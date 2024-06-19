@@ -10,7 +10,7 @@ class ElasticsearchService
 
     public function __construct($hosts, $token, $index)
     {
-        $this->client = new Elasticsearch($hosts, $token, $index);
+        $this->client = new Elasticsearch([$hosts], $token, $index);
     }
 
     public function insertLogs($logs)
