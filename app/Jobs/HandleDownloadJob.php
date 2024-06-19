@@ -70,6 +70,7 @@ class HandleDownloadJob implements ShouldQueue
         // update
         if ($downloadEntity) {
             $downloadEntity->status = StatusEnum::FAILURE->value;
+            $downloadEntity->error_message = $exception->getMessage();
             $downloadEntity->save();
             ExecuteScheduleEntity::where('id', $downloadEntity->execute_schedule_id)
                 ->update([
