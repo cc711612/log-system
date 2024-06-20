@@ -36,7 +36,8 @@ class RestartDownloadCommand extends Command
 
         foreach ($downloadChunkIds as $downloadIds) {
             foreach ($downloadIds as $downloadId) {
-                HandleDownloadJob::dispatch($downloadId);
+                HandleDownloadJob::dispatch($downloadId)
+                    ->onQueue('retry_download');
             }
             $this->updateDownloadByIds($downloadIds);
         }
