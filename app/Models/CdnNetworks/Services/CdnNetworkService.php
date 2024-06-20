@@ -196,7 +196,10 @@ class CdnNetworkService
                     Log::channel('download')->error('檔案格式錯誤，只支持.gz格式的日誌文件，檔案格式為:' . $fileInfo['extension']);
                 }
 
-                if ($this->status) {
+                if (
+                    $this->status &&
+                    Storage::disk($this->driver)->exists($fileInfo['filename'])
+                ) {
                     // 解析每一行日誌條目
                     $download = $this->updateDownLoad($download, ["type" => "parse"]);
 
@@ -214,7 +217,7 @@ class CdnNetworkService
                             continue;
                         }
 
-                        $log['measurement'] = $download->service_type;
+                        $log['servicetype'] = $download->service_type;
                         $log['servicegroup'] = $download->control_group_name;
 
                         array_push($logs, $log);
