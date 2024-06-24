@@ -15,6 +15,7 @@ class Elasticsearch
         $this->client = ClientBuilder::create()
             ->setHosts($hosts)
             ->setApiKey($token)
+            ->setSSLVerification(false)
             ->build();
         $this->index = $index;
     }
