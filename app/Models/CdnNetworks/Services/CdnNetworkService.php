@@ -238,7 +238,10 @@ class CdnNetworkService
                 if ($this->status) {
                     $download = $this->updateDownLoad($download, ["type" => "done", "status" => StatusEnum::SUCCESS->value]);
                 } else {
-                    $this->updateDownLoad($download, ["status" => StatusEnum::FAILURE->value]);
+                    $this->updateDownLoad($download, [
+                        "status" => StatusEnum::FAILURE->value,
+                        'error_message' => 'insert elasticsearch error'
+                    ]);
                 }
 
                 # 檢查執行的 execute_schedule_id 是否為最後一筆
