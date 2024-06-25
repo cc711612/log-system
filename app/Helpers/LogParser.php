@@ -23,8 +23,8 @@ class LogParser
                 case '1115':
                     $patterns = [
                         '/^(?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) (?P<uident>\S+) (?P<uname>\S+) \[(?P<datetime>[^\]]+)\] "(?P<method>[A-Z]+) (?P<url>[^\s]+) (?P<http_version>HTTP\/\d\.\d)" (?P<status>\d{1,3}) (?P<size>\d+) "(?P<referer>[^"]*)" "(?P<user_agent>.+)"$/',
-                        '/^(?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) (?P<uident>\S+) (?P<uname>\S+) \[(?P<datetime>[^\]]+)\] "(?P<method>[A-Z]+) (?P<url>[^\s]+) (?P<http_version>HTTP\/\d\.\d)" (?P<status>\d{1,3}) (?P<size>\d+) (?P<cache_status>[A-Z_]+)\s+(?P<cache_code>\d+|-)\s+(?P<cache_size>\d+|-)\s+(?P<response_bytes>\d+|-)\s+"(?P<referer>[^"]*)" "(?P<user_agent>.+)"$/',
-                        '/^(?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) - - \[(?P<datetime>[^\]]+)\] "(?P<method>[A-Z]+) (?P<url>[^\s]+) (?P<http_version>HTTP\/\d\.\d)" (?P<status>\d{3}) (?P<size>\d+) (?P<cache_status>[A-Z_]+) (?P<cache_code>\d+) (?P<cache_size>\d+) (?P<response_bytes>\d+) "(?P<referer>[^"]*)" "(?P<user_agent>[^"]*)"?$/'
+                        '/^(?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) (?P<uident>\S+) (?P<uname>\S+) \[(?P<datetime>[^\]]+)\] "(?P<method>[A-Z]+) (?P<url>[^\s]+) (?P<http_version>HTTP\/\d\.\d)" (?P<status>\d{1,3}) (?P<size>\d+) (?P<cache_status>[A-Z_]+)\s+(?P<cache_code>\d+|-)\s+(?P<pic_bt>\d+|-)\s+(?P<tru>\d+|-)\s+"(?P<referer>[^"]*)" "(?P<user_agent>.+)"$/',
+                        '/^(?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) - - \[(?P<datetime>[^\]]+)\] "(?P<method>[A-Z]+) (?P<url>[^\s]+) (?P<http_version>HTTP\/\d\.\d)" (?P<status>\d{3}) (?P<size>\d+) (?P<cache_status>[A-Z_]+) (?P<cache_code>\d+) (?P<pic_bt>\d+) (?P<tru>\d+) "(?P<referer>[^"]*)" "(?P<user_agent>[^"]*)"?$/'
                     ];
 
                     foreach ($patterns as $pattern) {
@@ -51,6 +51,8 @@ class LogParser
                             'firewall-action' => '',
                             'content-type' => '',
                             'size'         => $matches['size'],
+                            'origin-responsetime' => ($matches['pic_bt'] == "-") ? "" : $matches['pic_bt'],
+                            'origin-turnaroundtime' => $matches['tru']
                         ];
                     }
                     break;
