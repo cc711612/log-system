@@ -32,7 +32,7 @@ class LogParser
                         if (empty($matches) == true) {
                             continue;
                         }
-                        return [
+                        $result = [
                             'hostname'         => parse_url($matches['url'], PHP_URL_HOST),
                             'servicegroup' => '',
                             'timestamp' => Carbon::parse($matches['datetime'])->toIso8601String(),
@@ -55,6 +55,8 @@ class LogParser
                             'origin-turnaroundtime' => $matches['tru']
                         ];
                     }
+                    return $this->filterLog($result);
+
                     break;
                 case '1028':
                     // %host %uident %uname [%rt] "%method %url %rp" %code %size %cache %pic_bhs %pic_bt %tru "%referer" "%ua"
@@ -83,19 +85,8 @@ class LogParser
                         'origin-responsetime' => $matches['pic_bt'],
                         'origin-turnaroundtime' => $matches['tru']
                     ];
-                    $filterKeys = [
-                        'origin-responsetime',
-                        'origin-turnaroundtime'
-                    ];
-                    foreach ($filterKeys as $key) {
-                        if (isset($filterKeys[$key])) {
-                            if ($result[$key] == '-' || empty($result[$key])) {
-                                unset($result[$key]);
-                            }
-                        }
-                    }
-                    
-                    return $result;
+
+                    return $this->filterLog($result);
                     break;
                 case '1551':
                     // %host %uident %uname [%rt] "%method %url %rp" %code %size "%referer" "%ua" "%aty" "%ra" "%Content-Type"
@@ -144,5 +135,22 @@ class LogParser
             Log::driver('log_parse')->info($e->getMessage());
         }
         return [];
+    }
+
+
+    private function filterLog($logEntity)
+    {
+        $filterKeys = [
+            'origin-responsetime',
+            'origin-turnaroundtime'
+        ];
+        foreach ($filterKeys as $key) {
+            if (isset($filterKeys[$key])) {
+                if ($logEntity[$key] == '-' || empty($logEntity[$key])) {
+                    unset($logEntity[$key]);
+                }
+            }
+        }
+        return $logEntity;
     }
 }
