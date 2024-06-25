@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class LogParser
@@ -34,7 +35,7 @@ class LogParser
                         return [
                             'hostname'         => parse_url($matches['url'], PHP_URL_HOST),
                             'servicegroup' => '',
-                            'timestamp' => $matches['datetime'],
+                            'timestamp' => Carbon::parse($matches['datetime'])->toIso8601String(),
                             'clientIP' => $matches['ip'],
                             'uident'       => $matches['uident'] ?? '',
                             'uname'        => $matches['uname'] ?? '',
@@ -62,7 +63,7 @@ class LogParser
 
                     return [
                         'hostname'  => parse_url($matches['url'], PHP_URL_HOST),
-                        'timestamp' => $matches['datetime'],
+                        'timestamp' => Carbon::parse($matches['datetime'])->toIso8601String(),
                         'servicegroup' => '',
                         'clientIP' => $matches['ip'],
                         'uident'       => $matches['uident'],
@@ -100,7 +101,7 @@ class LogParser
                         return [
                             'hostname'         => parse_url($matches['url'], PHP_URL_HOST),
                             'servicegroup' => '',
-                            'timestamp' => $matches['datetime'],
+                            'timestamp' => Carbon::parse($matches['datetime'])->toIso8601String(),
                             'clientIP' => $matches['ip'],
                             'uident'       => $matches['uident'] ?? '',
                             'uname'        => $matches['uname'] ?? '',
