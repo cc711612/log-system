@@ -51,8 +51,6 @@ class LogParser
                             'firewall-action' => '',
                             'content-type' => '',
                             'size'         => $matches['size'],
-                            'origin-responsetime' => '',
-                            'origin-turnaroundtime' => '',
                         ];
                     }
                     break;
@@ -61,7 +59,7 @@ class LogParser
                     $pattern = '/^(?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) (?P<uident>\S+) (?P<uname>\S+) \[(?P<datetime>[^\]]+)\] "(?P<method>[A-Z]+) (?P<url>[^\s]+) (?P<http_version>HTTP\/\d\.\d)" (?P<status>\d{1,3}) (?P<size>\d+) (?P<cache>[A-Z_]+)\s+(?P<pic_bhs>\d+|-)\s+(?P<pic_bt>\d+|-)\s+(?P<tru>\d+|-)\s+"(?P<referer>[^"]*)" "(?P<user_agent>.+)"$/';
                     preg_match($pattern, $logEntry, $matches);
 
-                    return [
+                    $result = [
                         'hostname'  => parse_url($matches['url'], PHP_URL_HOST),
                         'timestamp' => Carbon::parse($matches['datetime'])->toIso8601String(),
                         'servicegroup' => '',
@@ -80,10 +78,22 @@ class LogParser
                         'firewall-action' => '',
                         'content-type' => '',
                         'size'         => $matches['size'],
-                        'origin-responsetime' => ($matches['pic_bt'] == "-") ? "" : $matches['pic_bt'],
+                        'origin-responsetime' => $matches['pic_bt'],
                         'origin-turnaroundtime' => $matches['tru']
                     ];
-
+                    $filterKeys = [
+                        'origin-responsetime',
+                        'origin-turnaroundtime'
+                    ];
+                    foreach ($filterKeys as $key) {
+                        if (isset($filterKeys[$key])) {
+                            if ($result[$key] == '-' || empty($result[$key])) {
+                                unset($result[$key]);
+                            }
+                        }
+                    }
+                    
+                    return $result;
                     break;
                 case '1551':
                     // %host %uident %uname [%rt] "%method %url %rp" %code %size "%referer" "%ua" "%aty" "%ra" "%Content-Type"
@@ -117,8 +127,6 @@ class LogParser
                             'firewall-action' => $matches['ra'] ?? '',
                             'content-type' => $matches['Content_Type'] ?? '',
                             'size'         => $matches['size'] ?? '',
-                            'origin-responsetime' => '',
-                            'origin-turnaroundtime' => '',
                         ];
                     }
 
