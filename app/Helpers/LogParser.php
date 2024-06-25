@@ -80,7 +80,7 @@ class LogParser
                         'firewall-action' => '',
                         'content-type' => '',
                         'size'         => $matches['size'],
-                        'origin-responsetime' => $matches['pic_bt'],
+                        'origin-responsetime' => ($matches['pic_bt'] == "-") ? "" : $matches['pic_bt'],
                         'origin-turnaroundtime' => $matches['tru']
                     ];
 
