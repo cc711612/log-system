@@ -264,8 +264,9 @@ class CdnNetworkService
                 }
                 // 刪除解壓後的文件
                 Storage::disk($this->driver)->delete($fileInfo['filename']);
+            } else {
+                throw new LogFileExtensionException('Download File Error');
             }
-            throw new LogFileExtensionException('Download File Error');
         } catch (LogProcessException $e) {
             $download->status = StatusEnum::FAILURE->value;
             $download->error_message = $e->getMessage();
