@@ -126,6 +126,7 @@ class LogParser
                             'origin-turnaroundtime' => $matches['tru']
                         ];
 
+                        dd($this->filterLog($result));
                         return $this->filterLog($result);
                     }
 
@@ -151,7 +152,7 @@ class LogParser
             'origin-turnaroundtime'
         ];
         foreach ($filterKeys as $key) {
-            if (isset($filterKeys[$key])) {
+            if (isset($logEntity[$key])) {
                 if ($logEntity[$key] == '-' || empty($logEntity[$key])) {
                     unset($logEntity[$key]);
                 }
