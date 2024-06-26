@@ -90,10 +90,11 @@ class LogParser
                     break;
                 case '1551':
                     // %host %uident %uname [%rt] "%method %url %rp" %code %size "%referer" "%ua" "%aty" "%ra" "%Content-Type"
+                    // %host %uident %uname [%rt] “%method %url %rp“ %code %size %cache %pic_bhs %pic_bt %src_time “%referer“ “%ua“ “%aty“ “%ra“ “%Content-Type
                     $patterns = [
                         '/^(?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) (?P<uident>\S+) (?P<uname>\S+) \[(?P<datetime>[^\]]+)\] "(?P<method>[A-Z]+) (?P<url>[^\s]+) (?P<http_version>[^"]+)" (?P<code>\d{1,3}) (?P<size>\d+) "(?P<referer>[^"]*)" "(?P<user_agent>[^"]*)" "(?P<aty>[^"]*)" "(?P<ra>[^"]*)" "(?P<Content_Type>.+)"$/',
                         '/^(?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) \S+ \S+ \[(?P<datetime>[^\]]+)\] "(?P<method>[A-Z]+) (?P<url>[^"]+) (?P<http_version>[^"]+)" (?P<code>\d{3}) (?P<size>\d+) "(?P<referer>[^"]*)" "(?P<user_agent>[^"]*)/',
-                        '/^(?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) (?P<uident>\S+) (?P<uname>\S+) \[(?P<datetime>[^\]]+)\] "(?P<method>[A-Z]+) (?P<url>[^\s]+) (?P<http_version>[^"]+)" (?P<code>\d{1,3}) (?P<size>\d+) (?P<cache_status>[A-Z_]+) (?P<cache_code>\d+) (?P<pic_bt>\d+) (?P<tru>\d+) "(?P<referer>[^"]*)" "(?P<user_agent>[^"]*)" "(?P<aty>[^"]*)" "(?P<ra>[^"]*)" "(?P<Content_Type>.+)"$/',
+                        '/^(?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) (?P<uident>\S+) (?P<uname>\S+) \[(?P<datetime>[^\]]+)\] "(?P<method>[A-Z]+) (?P<url>[^\s]+) (?P<http_version>[^"]+)" (?P<code>\d{1,3}) (?P<size>\d+) (?P<cache_status>[A-Z_]+) (?P<cache_code>[A-Z_\d\-]+) (?P<pic_bt>[A-Z_\d\-]+) (?P<tru>[A-Z_\d\-]+) "(?P<referer>[^"]*)" "(?P<user_agent>[^"]*)" "(?P<aty>[^"]*)" "(?P<ra>[^"]*)" "(?P<Content_Type>.+)"$/',
                     ];
 
                     foreach ($patterns as $pattern) {

@@ -35,7 +35,7 @@ class LogParserTestCommand extends Command
         $TestData = [
             [
                 "type" => 1551,
-                "data" => '40.77.167.50 - - [25/Jun/2024:22:08:39 +0800] "GET https://u022ob.hrv0968.net/(S(xideqseTF7K3n3i5n3u1yu54f4oyajgjrdfyi39kj2fqMP2gkNmF9qWPk4QZZ))/newindex HTTP/2.0" 200 1727 TCP_MISS 200 109 109 "-" "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm) Chrome/116.0.1938.76 Safari/537.36" "NONE" "NONE" "text/html; charset=utf-8"'
+                "data" => '103.212.118.173 - - [26/Jun/2024:13:56:54 +0800] "GET https://onebop.mpulsefusion.com/ HTTP/2.0" 0 0 TCP_MISS - - - "-" "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36" "NONE" "NONE" "-"'
             ]
         ];
 
