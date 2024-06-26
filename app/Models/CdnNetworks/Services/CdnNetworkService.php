@@ -2,6 +2,7 @@
 
 namespace App\Models\CdnNetworks\Services;
 
+use App\Exceptions\LogFileExtensionException;
 use App\Exceptions\LogProcessException;
 use App\Helpers\CDNNetwork;
 use App\Helpers\Enums\StatusEnum;
@@ -261,9 +262,10 @@ class CdnNetworkService
                             'process_time_end' => now()->toDateTimeString()
                         ]);
                 }
+                // 刪除解壓後的文件
+                Storage::disk($this->driver)->delete($fileInfo['filename']);
             }
-            // 刪除解壓後的文件
-            Storage::disk($this->driver)->delete($fileInfo['filename']);
+            throw new LogFileExtensionException('Download File Error');
         } catch (LogProcessException $e) {
             $download->status = StatusEnum::FAILURE->value;
             $download->error_message = $e->getMessage();
