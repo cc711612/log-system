@@ -126,7 +126,7 @@ class LogParser
                             'origin-turnaroundtime' => $matches['tru']
                         ];
 
-                        $this->filterLog($result);
+                        return $this->filterLog($result);
                     }
 
                     break;

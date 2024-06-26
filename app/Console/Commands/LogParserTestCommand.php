@@ -36,6 +36,10 @@ class LogParserTestCommand extends Command
             [
                 "type" => 1551,
                 "data" => '103.212.118.173 - - [26/Jun/2024:13:56:54 +0800] "GET https://onebop.mpulsefusion.com/ HTTP/2.0" 0 0 TCP_MISS - - - "-" "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36" "NONE" "NONE" "-"'
+            ],
+            [
+                "type" => 1551,
+                "data" => '184.22.71.252 - - [26/Jun/2024:14:25:00 +0800] "GET https://onelic.mpulsefusion.com/ HTTP/2.0" 200 691 TCP_MISS 200 53 160 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36" "NONE" "NONE" "text/plain"'
             ]
         ];
 
