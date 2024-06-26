@@ -202,12 +202,13 @@ class CdnNetworkService
                 ) {
                     // 解析每一行日誌條目
                     $download = $this->updateDownLoad($download, ["type" => "parse"]);
-
+                    $filePath = Storage::disk($this->driver)->path($fileInfo['filename']);
                     $count = 0;
+                    $insertCountLimit = config('elasticsearch.insertCount');
                     $logs = [];
-                    foreach (File::lines(Storage::disk($this->driver)->path($fileInfo['filename'])) as $line) {
+                    foreach (File::lines($filePath) as $line) {
                         if ($line == "") {
-                            break;
+                            continue;
                         }
 
                         $log = $logParser->parseLogEntry($line, $download->service_type);
@@ -220,10 +221,10 @@ class CdnNetworkService
                         $log['servicetype'] = $download->service_type;
                         $log['servicegroup'] = $download->control_group_name;
 
-                        array_push($logs, $log);
+                        $logs[] = $log;
 
                         $count++;
-                        if ($count >= config('elasticsearch.insertCount')) {
+                        if ($count >= $insertCountLimit) {
                             $this->insertElasticsearch($logs);
                             $count = 0;
                             $logs = [];
