@@ -103,7 +103,7 @@ class LogParser
                             continue;
                         }
 
-                        return [
+                        $result = [
                             'hostname'         => parse_url($matches['url'], PHP_URL_HOST),
                             'servicegroup' => '',
                             'timestamp' => Carbon::parse($matches['datetime'])->toIso8601String(),
@@ -125,6 +125,8 @@ class LogParser
                             'origin-responsetime' => $matches['pic_bt'],
                             'origin-turnaroundtime' => $matches['tru']
                         ];
+
+                        $this->filterLog($result);
                     }
 
                     break;
