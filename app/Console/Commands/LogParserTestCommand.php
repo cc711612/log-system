@@ -35,12 +35,8 @@ class LogParserTestCommand extends Command
         $TestData = [
             [
                 "type" => 1551,
-                "data" => '171.244.212.228 - - [19/Jun/2024:17:00:37 +0800] "GET https://onebop.mpulsefusion.com/ HTTP/2.0" 200 349 "-" "Mozilla/5.'
-            ],
-            [
-                "type" => 1115,
-                "data" => '49.149.108.135 - - [19/Jun/2024:11:22:43 +0000] "GET https://y2j9ma.gon1836.com/api/Config/GetSiteConfigWithSession HTTP/2.0" 200 492 TCP_MISS 200 60 60 "https://y2j9gp.gon1836.com/" "Mozilla/5.0 (Linux; Android 13; en; TECNO CK7n Build/SP'
-            ],
+                "data" => '40.77.167.50 - - [25/Jun/2024:22:08:39 +0800] "GET https://u022ob.hrv0968.net/(S(xideqseTF7K3n3i5n3u1yu54f4oyajgjrdfyi39kj2fqMP2gkNmF9qWPk4QZZ))/newindex HTTP/2.0" 200 1727 TCP_MISS 200 109 109 "-" "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm) Chrome/116.0.1938.76 Safari/537.36" "NONE" "NONE" "text/html; charset=utf-8"'
+            ]
         ];
 
         foreach ($TestData as $Data){
