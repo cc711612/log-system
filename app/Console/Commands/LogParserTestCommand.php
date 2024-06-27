@@ -34,12 +34,12 @@ class LogParserTestCommand extends Command
 
         $TestData = [
             [
-                "type" => 1551,
-                "data" => '103.212.118.173 - - [26/Jun/2024:13:56:54 +0800] "GET https://onebop.mpulsefusion.com/ HTTP/2.0" 0 0 TCP_MISS - - - "-" "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36" "NONE" "NONE" "-"'
+                "type" => 1115,
+                "data" => '212.18.122.92 - - [26/Jun/2024:23:27:03 +0000] "POST https://i1l7oa.plm0865.net/(S(xideqseTk2L3gsvh0cqtduxi5lgbzd1tlcvs1oW3aq5CdLPJ-zjU-Jt0v8gZZ))/login_checkin.aspx HTTP/2.0" 302 4226 "https://i1l7oa.plm0865.net/(S(xideqseTk2L3gsvh0cqtduxi5lgbzd1tlcvs1oW3aq5CdLPJ-zjU-Jt0v8gZZ))/NewIndex?lang=en&webskintype=3" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"'
             ],
             [
-                "type" => 1551,
-                "data" => '184.22.71.252 - - [26/Jun/2024:14:25:00 +0800] "GET https://onelic.mpulsefusion.com/ HTTP/2.0" 200 691 TCP_MISS 200 53 160 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36" "NONE" "NONE" "text/plain"'
+                "type" => 1115,
+                "data" => '192.228.154.178 - - [26/Jun/2024:23:27:58 +0000] "POST https://q2v1gp.plm0865.net/zh-CN/live/1 HTTP/2.0" 200 4057 "https://q2v1gp.plm0865.net/zh-CN/live/1" "Mozilla/5.0 (Linux; Android 11; 2201117TG Build/RKQ1.211001.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/126.0.6478.71 Mobile Safari/537.36"'
             ]
         ];
 

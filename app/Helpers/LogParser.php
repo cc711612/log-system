@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -51,8 +52,8 @@ class LogParser
                             'firewall-action' => '',
                             'content-type' => '',
                             'size'         => $matches['size'],
-                            'origin-responsetime' => ($matches['pic_bt'] == "-") ? "" : $matches['pic_bt'],
-                            'origin-turnaroundtime' => $matches['tru']
+                            'origin-responsetime' => (Arr::get($matches,'pic_bt',"-") == "-") ? "" : Arr::get($matches,'pic_bt',"-"),
+                            'origin-turnaroundtime' => Arr::get($matches,'tru',"")
                         ];
                     }
                     return $this->filterLog($result);
